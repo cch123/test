@@ -1,0 +1,16 @@
+<html>
+  <body>
+    <script type="text/javascript">
+      var name = "trigkit4";
+      var segmentFault = {
+        name : "My SF",
+        getNameFunc : function(){
+          return function(){
+            return this.name;
+          };
+        }
+      };
+      alert(segmentFault.getNameFunc()());  //弹出trigkit4
+    </script>
+  </body>
+</html>

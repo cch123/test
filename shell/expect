@@ -1,0 +1,12 @@
+#!/usr/bin/sh
+user=$1
+if [[ $user -eq "me" ]];
+then
+  expect  << EOF
+  set timeout 30
+  spawn  ssh root@10.10.38.89 -o StrictHostKeyChecking=no
+  expect "password"
+  send "iovVmVI!@vm\r"
+  expect eof
+EOF
+fi
