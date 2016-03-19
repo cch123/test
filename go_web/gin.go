@@ -3,6 +3,9 @@ package main
 import "github.com/gin-gonic/gin"
 import "net/http"
 import "os"
+import "io"
+import "fmt"
+import "log"
 
 //import "reflect"
 
@@ -38,13 +41,15 @@ func main() {
 		c.String(http.StatusOK, message)
 	})
 
-	//注意这个例子和上面那个的区别
-	r.GET("/user/:name/*action", func(c *gin.Context) {
-		name := c.Param("name")
-		action := c.Param("action")
-		message := name + " is " + action
-		c.String(http.StatusOK, message)
-	})
+	/*
+		//注意这个例子和上面那个的区别
+		r.GET("/user/:name/*action", func(c *gin.Context) {
+			name := c.Param("name")
+			action := c.Param("action")
+			message := name + " is " + action
+			c.String(http.StatusOK, message)
+		})
+	*/
 
 	//url里有querystring的
 	// Query string parameters are parsed using the existing underlying request object.
@@ -102,7 +107,7 @@ func main() {
 
 	// 路由分组，用来做api的版本管理
 	// Simple group: v1
-	v1 := router.Group("/v1")
+	v1 := r.Group("/v1")
 	{
 		v1.POST("/login", handler)
 		v1.POST("/submit", handler)
@@ -110,7 +115,7 @@ func main() {
 	}
 
 	// Simple group: v2
-	v2 := router.Group("/v2")
+	v2 := r.Group("/v2")
 	{
 		v2.POST("/login", handler)
 		v2.POST("/submit", handler)
