@@ -62,3 +62,10 @@ call_user_func(
     )
     , ""
 );
+
+  $x =  array_reduce(     array_reverse($middleware),
+        getSlice(),
+        firstSlice("process", "")
+    );
+
+print_r($x);

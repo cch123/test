@@ -1,7 +1,37 @@
 package main
 
 func main() {
-	a := []string{}
+	a := make([]string, 0, 100)
+	println(a)
+	println(len(a))
+	println(cap(a))
+	a = append(a, "fuck")
+	println(a)
+	println(len(a))
+	println(cap(a))
+
+	a = append(a, "fuck")
+	println(a)
+	println(len(a))
+	println(cap(a))
+
+	a = append(a, "fuck")
+	println(a)
+	println(len(a))
+	println(cap(a))
+	a = append(a, "fuck")
+	println(a)
+	println(len(a))
+	println(cap(a))
+	a = append(a, "fuck")
+	println(a)
+	println(len(a))
+	println(cap(a))
+	a = append(a, "fuck")
+	println(a)
+	println(len(a))
+	println(cap(a))
+	a = append(a, "fuck")
 	println(a)
 	println(len(a))
 	println(cap(a))

@@ -1,7 +1,9 @@
 package main
 
+import "fmt"
+
 func main() {
-	var str = &struct {
+	var str = struct {
 		settings struct {
 			name string
 		}
@@ -10,4 +12,5 @@ func main() {
 			name: "fuck",
 		},
 	}
+	fmt.Printf("%+v\n", str)
 }
