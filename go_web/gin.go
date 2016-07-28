@@ -1,6 +1,10 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import (
+	"reflect"
+
+	"github.com/gin-gonic/gin"
+)
 import "net/http"
 import "os"
 import "io"
@@ -10,6 +14,12 @@ import "log"
 //import "reflect"
 
 func handler(c *gin.Context) {
+	var a interface{}
+	err := c.BindJSON(&a)
+	if err != nil {
+	}
+
+	fmt.Println(reflect.TypeOf(a.(map[string]interface{})["a"]))
 	c.JSON(http.StatusOK, gin.H{
 		"status": 0,
 		"msg":    "success",
