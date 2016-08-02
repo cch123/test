@@ -8,5 +8,6 @@ func main() {
 	fmt.Println(reflect.TypeOf(i))
 	fmt.Println(reflect.ValueOf(i))
 	fmt.Println(reflect.ValueOf(i).Type())
+	fmt.Println(reflect.ValueOf(i).Kind())
 	fmt.Println(reflect.ValueOf(i).Int())
 }

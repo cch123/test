@@ -16,7 +16,6 @@ test: go-deps
 
 clean:
 	go clean -i ./...
-	rm -f bin/kafka-importer
 	rm -rf status/
 
 output: build
