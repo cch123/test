@@ -12,9 +12,9 @@ func f() {
 }
 
 func main() {
-	for i := 0; i < 100000; i++ {
+	for i := 0; i < 10000; i++ {
 		go f()
 	}
 
-	http.ListenAndServe(":11181", nil)
+	http.ListenAndServe(":8080", nil)
 }
