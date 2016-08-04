@@ -2,12 +2,14 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 )
 
 func sayhello(wr http.ResponseWriter, r *http.Request) {
 	fmt.Println("oh yeah")
+	io.WriteString(wr, "hello")
 }
 
 func main() {
