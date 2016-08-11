@@ -8,6 +8,7 @@ func main() {
 	var b interface{}
 	json.Unmarshal([]byte(a), &b)
 	fmt.Println(b)
-	c, ok := b.(map[string](map[string]int))
-	fmt.Println(c, ok)
+	//c, ok := b.(map[string](map[string]int))
+	c := map[string](map[string]int)(b)
+	fmt.Println(c)
 }
