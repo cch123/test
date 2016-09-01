@@ -8,7 +8,7 @@ import (
 func main() {
 	time0 := time.Unix(1469179423000/1000, 0)
 	time1 := time.Unix(1479189423000/1000, 0)
-	time2 := time.Unix(1479189423000/1000, 0)
+	time2 := time.Now()
 	diff := time1.Sub(time0)
 	diff2 := time2.Sub(time1)
 
