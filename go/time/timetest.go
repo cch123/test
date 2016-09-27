@@ -27,4 +27,5 @@ func main() {
 	fmt.Println(time0)
 	fmt.Println(time1)
 	fmt.Println(time2)
+	fmt.Println(time0.Format("2006-01-02T15:04:04+0800"))
 }
