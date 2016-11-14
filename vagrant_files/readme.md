@@ -1,0 +1,5 @@
+Vagrantfile是vagrant的配置文件，里面有关于vagrant-triggers的配置，如果能够成功安装vagrant-triggers这个插件的话，则不需要在mac上做额外的端口转发，如果不能安装，那么需要在启动虚拟机的时候运行init.sh
+
+init.sh是在mac上用来转发80到8080，443到4443端口的脚本
+
+uinit.sh是取消上述操作的脚本
