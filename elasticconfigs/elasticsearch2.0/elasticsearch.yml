@@ -52,7 +52,8 @@
 # Set the bind adress to a specific IP (IPv4 or IPv6):
 #
 #network.host: 10.10.39.13 # 192.168.0.1
-network.host: 0.0.0.0
+# 2.0之后必须显式指定所有绑定的host，一般为了本地和线上同时能访问
+network.host: [localhost, 111.11.11.1]
 #
 # Set a custom port for HTTP:
 #
@@ -77,10 +78,11 @@ network.host: 0.0.0.0
 # Pass an initial list of hosts to perform discovery when new node is started:
 # The default list of hosts is ["127.0.0.1", "[::1]"]
 #
-# discovery.zen.ping.unicast.hosts: ["host1", "host2"]
+# 集群节点发现配置
+discovery.zen.ping.unicast.hosts: ["host1", "host2"]
 #
 # Prevent the "split brain" by configuring the majority of nodes (total number of nodes / 2 + 1):
-#
+# 这个参数是避免脑裂的，如果集群的节点数<该数字时，就直接拒绝访问
 # discovery.zen.minimum_master_nodes: 3
 #
 # For more information, see the documentation at:
@@ -95,3 +97,6 @@ network.host: 0.0.0.0
 # Require explicit names when deleting indices:
 #
 # action.destructive_requires_name: true
+# 这个选项决定了terms查询里的项数，也是总查询的clause数上限，默认是1024
+
+index.query.bool.max_clause_count: 4096

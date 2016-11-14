@@ -1,0 +1,8 @@
+{
+  "source": {
+    "index": "ark_callcenter"
+  },
+  "dest": {
+    "index": "ark_callcenter_g_service_worksheet"
+  }
+}
