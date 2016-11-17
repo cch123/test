@@ -1,0 +1,6 @@
+@startuml
+actor "星际穿越的男主角" as copper
+actor "星际穿越的男主女儿" as murphy
+
+copper -> murphy: 爱和引力可以穿越
+@enduml

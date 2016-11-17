@@ -1,0 +1,6 @@
+@startuml
+actor "星际穿越的\n<b>男主角</b>" as copper #99ff99
+actor "星际穿越的\n男主女儿" as murphy #red
+
+copper -[#orange]> murphy: 爱和<font color=red>引力</font>可以穿越
+@enduml

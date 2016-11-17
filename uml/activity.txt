@@ -1,0 +1,18 @@
+@startuml
+
+scale 1024*768
+
+start
+
+if (exec Lazarus?) then (yes)
+    :find a livable planet;
+    :save **human beings**;
+else (no)
+    :keep adapting,
+    __keep farming__ and <font color=red>keep dying</font>;
+endif
+
+stop
+
+@enduml
+

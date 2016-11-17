@@ -1,0 +1,9 @@
+@startuml
+participant Ark
+participant Noah
+participant "SMS网关" as sms
+
+Ark -> Noah : send sms
+Noah -> sms : send request
+Noah --> Ark : return success
+@enduml

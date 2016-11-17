@@ -1,0 +1,9 @@
+@startuml
+participant Ark #white
+participant Noah #eeffee
+participant "<b>SMS</b> \n网关" as sms
+
+Ark -[#orange]> Noah : send sms
+Noah -> sms : send request
+Noah --[#red]> Ark : return <font color=red>success</font>
+@enduml

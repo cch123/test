@@ -1,0 +1,23 @@
+@startuml
+scale 1366*768
+
+[--> Tars: "They" provides data inside singularity
+
+activate Tars
+Tars -> Copper: sending data
+activate Copper
+
+Copper -> Copper: translate to morse code
+activate Murphy
+
+Copper -> Murphy: send morse code through watch
+deactivate Copper
+
+Murphy -> Murphy: record and parse morse code
+
+Murphy -->]: figure out the formula
+
+deactivate Murphy
+deactivate Tars
+
+@enduml
