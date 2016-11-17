@@ -1,0 +1,20 @@
+@startuml
+scale 512*1024
+
+|Gateway|
+start
+repeat
+    :record data;
+    :wating;
+repeat while (id < 10)
+
+|#778899|<font color=white>Copper</font>|
+:enter the Endurance;
+while (not hungry)
+    :play;
+    :kick football;
+endwhile
+
+end
+
+@enduml

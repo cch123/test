@@ -1,0 +1,25 @@
+@startuml
+scale 1024*768
+
+start
+
+:first planet: Miller;
+
+fork
+    :Romilly: stay in the Endurance;
+fork again
+    :Copper et al: go to planet Miller;
+    :giant wave comes;
+    fork
+        :Copper found wave, but helpless;
+    fork again
+        :Brand is racing against the wave;
+    fork again
+        :Doyle wait for Brand;
+        :Doyle died;
+        kill
+    endfork
+    :they finally left the planet;
+endfork
+
+@enduml
