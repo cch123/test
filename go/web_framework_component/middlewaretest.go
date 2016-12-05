@@ -18,7 +18,7 @@ func performRequest(r http.Handler, method, path string) *httptest.ResponseRecor
 func main() {
 	signature := ""
 	router := gin.New()
-	router.HandleMethodNotAllowed = true
+	//router.HandleMethodNotAllowed = true
 	router.Use(func(c *gin.Context) {
 		signature += "A"
 		c.Next()
