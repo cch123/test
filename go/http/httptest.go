@@ -8,6 +8,7 @@ import (
 )
 
 func sayhello(wr http.ResponseWriter, r *http.Request) {
+	panic("fuck")
 	fmt.Println("oh yeah")
 	io.WriteString(wr, "hello")
 }
