@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	rl := ratelimit.New(10) // per second
+	rl := ratelimit.New(1) // per second
 
 	prev := time.Now()
 	for i := 0; i < 10; i++ {
