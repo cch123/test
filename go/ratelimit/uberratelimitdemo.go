@@ -19,10 +19,14 @@ func main() {
 
 	prev := time.Now()
 	time.Sleep(time.Second * 4)
+	ch := make(chan struct{})
 	for i := 0; i < 10; i++ {
 		//每次调用前take一下就好了，有时间看看实现~
-		now := rl.Take()
-		fmt.Println(i, now.Sub(prev))
-		prev = now
+		go func() {
+			now := rl.Take()
+			fmt.Println(i, now.Sub(prev))
+			prev = now
+		}()
 	}
+	<-ch
 }
