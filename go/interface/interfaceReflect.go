@@ -10,4 +10,6 @@ func main() {
 	fmt.Println(reflect.TypeOf(val))
 	val = 50
 	fmt.Println(reflect.TypeOf(val))
+	val = "abc"
+	fmt.Println(reflect.TypeOf(val))
 }
