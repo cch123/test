@@ -13,4 +13,5 @@ func main() {
 	println(a[id2])
 	fmt.Println(reflect.TypeOf(id))
 	fmt.Println(reflect.TypeOf(id2))
+	fmt.Printf("%#v", "a")
 }
