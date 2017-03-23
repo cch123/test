@@ -59,7 +59,14 @@ func noSprintfAndPreallocatedSlice() {
 
 func bytesBufferAppend() {
 	var msg bytes.Buffer
-	msg.WriteString("userid : 1")
-	msg.WriteString("location : ab")
+	msg.WriteString("userid : " + "1")
+	msg.WriteString("location : " + "ab")
+	//msg.String()
+}
+
+func bytesBufferAppendSprintf() {
+	var msg bytes.Buffer
+	msg.WriteString(fmt.Sprintf("userid : %d", 1))
+	msg.WriteString(fmt.Sprintf("location : %s", "ab"))
 	//msg.String()
 }
