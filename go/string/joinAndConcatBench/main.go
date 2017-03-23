@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"strings"
 )
@@ -54,4 +55,11 @@ func noSprintfAndPreallocatedSlice() {
 	arr = append(arr, "userid :"+"1")
 	arr = append(arr, "location: "+"ab")
 	msg += strings.Join(arr, "")
+}
+
+func bytesBufferAppend() {
+	var msg bytes.Buffer
+	msg.WriteString("userid : 1")
+	msg.WriteString("location : ab")
+	//msg.String()
 }

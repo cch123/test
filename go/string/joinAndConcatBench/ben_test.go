@@ -38,3 +38,9 @@ func BenchmarkNoSprintfAndPreallocatedSlice(b *testing.B) {
 		noSprintfAndPreallocatedSlice()
 	}
 }
+
+func BenchmarkBytesBufferAppend(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		bytesBufferAppend()
+	}
+}
