@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 func mergeSort(input []int) {
 	// from interval 1 to interval len(input)/2
 	// merge the array
@@ -36,7 +38,8 @@ func mergeSort(input []int) {
 
 		interval *= 2
 	}
-	//fmt.Println(input)
+
+	fmt.Println(input)
 }
 
 func main() {
