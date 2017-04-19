@@ -1,0 +1,6 @@
+目前的binding和validate模块普遍存在一个问题
+
+因为golang的int、string之类的字段的语义缺失问题的关系(不能=nil)，如果先bind，再validate，没有办法判断一个字段的0值是因为默认值导致还是因为用户输入导致
+
+而大多数validate模块的required实际上也就只是判断deserilize之后的值是否是字段的默认值而已，这样的判断是不严谨的。很可能会出bug
+

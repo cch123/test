@@ -15,8 +15,9 @@ import (
 
 type Person struct {
 	Age  int    `json:"age" binding:"gte=0,lte=130"`
-	Name int    `json:"name" binding:"required,lt=10"`
-	AAA  string `json:"aaa" binding:"required"`
+	Name int    `json:"name" binding:"lt=10"`
+	AAA  string `json:"aaa" binding:"lt=10"`
+	T    int    `json:"t" binding:"ne=1,ne=0"`
 }
 
 func sayhello(wr http.ResponseWriter, r *http.Request) {
@@ -26,7 +27,8 @@ func sayhello(wr http.ResponseWriter, r *http.Request) {
 	if len(contentType) > 0 {
 		b := binding.Default("POST", contentType[0])
 		err := b.Bind(r, &p)
-		fmt.Println(p, err)
+		fmt.Printf("%#v", p)
+		fmt.Println(err)
 	} else {
 		fmt.Println("no content type")
 	}
