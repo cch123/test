@@ -1,3 +1,5 @@
+// schema库会在内部绑定的时候把错误返回来
+// 如果自己用，感觉需要一些定制
 package main
 
 import (
