@@ -1,15 +1,15 @@
 package main
 
 import (
+	"fmt"
+	"io"
+	"log"
+	"net/http"
+	"os"
 	"reflect"
 
 	"github.com/gin-gonic/gin"
 )
-import "net/http"
-import "os"
-import "io"
-import "fmt"
-import "log"
 
 //import "reflect"
 
