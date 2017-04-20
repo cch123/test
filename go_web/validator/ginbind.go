@@ -6,6 +6,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -14,10 +15,11 @@ import (
 )
 
 type person struct {
-	Age  int    `json:"age" binding:"gte=0,lte=130"`
+	Age  int    `json:"age" binding:"gte=0,lte=130,required"`
 	Name int    `json:"name" binding:"lt=10"`
 	AAA  string `json:"aaa" binding:"lt=10"`
 	T    int    `json:"t" binding:"ne=1,ne=0"`
+	X    *int   `json:"x" form:"x" binding:"required"`
 }
 
 func contentType(r *http.Request) string {
@@ -55,6 +57,9 @@ func sayhello(wr http.ResponseWriter, r *http.Request) {
 	err := bind(r, &p)
 	fmt.Printf("%#v", p)
 	fmt.Println(err)
+
+	d, _ := json.Marshal(p)
+	fmt.Println(string(d))
 }
 
 func main() {
