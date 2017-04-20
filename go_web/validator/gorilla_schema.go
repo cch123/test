@@ -31,7 +31,12 @@ func sayhello(wr http.ResponseWriter, r *http.Request) {
 	err = decoder.Decode(&person, r.PostForm)
 	if err != nil {
 		// Handle error
-		fmt.Println(err)
+		merr := err.(schema.MultiError)
+		fmt.Println(merr)
+		for k, v := range merr {
+			fmt.Println("key", k)
+			fmt.Println("val", v)
+		}
 	}
 	fmt.Printf("%#v\n", person)
 }

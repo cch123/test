@@ -13,25 +13,48 @@ import (
 	"github.com/gin-gonic/gin/binding"
 )
 
-type Person struct {
+type person struct {
 	Age  int    `json:"age" binding:"gte=0,lte=130"`
 	Name int    `json:"name" binding:"lt=10"`
 	AAA  string `json:"aaa" binding:"lt=10"`
 	T    int    `json:"t" binding:"ne=1,ne=0"`
 }
 
-func sayhello(wr http.ResponseWriter, r *http.Request) {
-	p := Person{}
-	fmt.Println(r.Header["Content-Type"])
-	contentType := r.Header["Content-Type"]
-	if len(contentType) > 0 {
-		b := binding.Default("POST", contentType[0])
-		err := b.Bind(r, &p)
-		fmt.Printf("%#v", p)
-		fmt.Println(err)
-	} else {
-		fmt.Println("no content type")
+func contentType(r *http.Request) string {
+	return filterFlags(requestHeader(r, "Content-Type"))
+}
+
+func filterFlags(content string) string {
+	for i, char := range content {
+		if char == ' ' || char == ';' {
+			return content[:i]
+		}
 	}
+	return content
+}
+
+func requestHeader(r *http.Request, key string) string {
+	if values, ok := r.Header[key]; ok {
+		return values[0]
+	}
+	return ""
+}
+
+func bind(r *http.Request, dst interface{}) error {
+	contentType := contentType(r)
+	if len(contentType) == 0 {
+		// do some thing?
+	}
+
+	b := binding.Default(r.Method, contentType)
+	return b.Bind(r, dst)
+}
+
+func sayhello(wr http.ResponseWriter, r *http.Request) {
+	p := person{}
+	err := bind(r, &p)
+	fmt.Printf("%#v", p)
+	fmt.Println(err)
 }
 
 func main() {
