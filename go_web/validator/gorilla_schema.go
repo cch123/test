@@ -14,7 +14,7 @@ var decoder = schema.NewDecoder()
 
 type Person struct {
 	Name   string
-	Phone  int64
+	Phone  *int64
 	Height []float64
 	Salary float64
 }
@@ -39,6 +39,7 @@ func sayhello(wr http.ResponseWriter, r *http.Request) {
 		}
 	}
 	fmt.Printf("%#v\n", person)
+	fmt.Println("decoded phone number is :", *person.Phone)
 }
 
 func main() {

@@ -10,16 +10,14 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gin-gonic/gin/binding"
+	"encoding/json"
+
+	"github.com/cch123/binding"
 )
 
 type person struct {
-	Age  int    `json:"age" binding:"gte=0,lte=130,required"`
-	Name int    `json:"name" binding:"lt=10"`
-	AAA  string `json:"aaa" binding:"lt=10"`
-	T    int    `json:"t" binding:"ne=1,ne=0"`
-	X    *int   `json:"x" form:"x" binding:"required"`
-	Y    *int   `json:"y" form:"y" binding:"required,gt=-1,lt=10"`
+	X int  `json:"x" form:"x" binding:"required,gt=-1,lt=10"`
+	Y *int `json:"y" form:"y" binding:"required,gt=-1,lt=10"`
 }
 
 func contentType(r *http.Request) string {
@@ -57,10 +55,9 @@ func sayhello(wr http.ResponseWriter, r *http.Request) {
 	p := person{}
 	err := bind(r, &p)
 	fmt.Printf("%#v\n", p)
-	fmt.Println(err)
-
-	//d, _ := json.Marshal(p)
-	//fmt.Println(string(d))
+	fmt.Println("err is ", err)
+	b, _ := json.Marshal(p)
+	fmt.Println(string(b))
 }
 
 func main() {
