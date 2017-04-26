@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"encoding/json"
 
@@ -16,8 +17,9 @@ import (
 )
 
 type person struct {
-	X int  `json:"x" form:"x" binding:"required,gt=-1,lt=10"`
-	Y *int `json:"y" form:"y" binding:"required,gt=-1,lt=10"`
+	X int       `json:"x" form:"x" binding:"required,gt=-1,lt=10"`
+	Y *int      `json:"y" form:"y" binding:"required,gt=-1,lt=10"`
+	Z time.Time `json:"z" form:"z" binding:"required"`
 }
 
 func contentType(r *http.Request) string {
