@@ -3,53 +3,58 @@ package main
 import "fmt"
 
 func main() {
-	fmt.Println(findMedianSortedArrays([]int{}, []int{2, 3}))
-}
-
-func findMedianSortedArrays2(nums1 []int, nums2 []int) float64 {
-	// 处理单数组为空的情况
-
-	// 未处理单数组为空的情况
-	evenFlag = false
-	if (len(nums1)+len(nums2))%2 == 0 {
-		evenFlag = true
+	l1 := &ListNode{Val: 5}
+	l2 := &ListNode{Val: 5}
+	l := addTwoNumbers(l1, l2)
+	for l != nil {
+		fmt.Println(l.Val)
+		l = l.Next
 	}
-
 }
 
-func findMedianSortedArrays(nums1 []int, nums2 []int) float64 {
-	numMerged := make([]int, len(nums1)+len(nums2))
-	i, j, k := 0, 0, 0
-	for {
-		if i >= len(nums1) || j >= len(nums2) {
-			break
-		}
+type ListNode struct {
+	Val  int
+	Next *ListNode
+}
 
-		if nums1[i] < nums2[j] {
-			numMerged[k] = nums1[i]
-			i++
+func addTwoNumbers(l1 *ListNode, l2 *ListNode) *ListNode {
+	reserved := 0
+	var listHead = &ListNode{}
+	var currentNode = listHead
+	for l1 != nil {
+		if l2 != nil {
+			currentNode.Next = &ListNode{}
+			currentNode = currentNode.Next
+
+			currentNode.Val = (l1.Val + l2.Val + reserved) % 10
+			reserved = (l1.Val + l2.Val + reserved) / 10
+			l1 = l1.Next
+			l2 = l2.Next
 		} else {
-			numMerged[k] = nums2[j]
-			j++
+			// l1!=nil && l2=nil
+			currentNode.Next = &ListNode{}
+			currentNode = currentNode.Next
+
+			currentNode.Val = (l1.Val + reserved) % 10
+			reserved = (l1.Val + reserved) / 10
+			l1 = l1.Next
 		}
-
-		k++
 	}
 
-	for i < len(nums1) {
-		numMerged[k] = nums1[i]
-		i++
-		k++
+	for l2 != nil {
+		currentNode.Next = &ListNode{}
+		currentNode = currentNode.Next
+
+		currentNode.Val = (l2.Val + reserved) % 10
+		reserved = (l2.Val + reserved) / 10
+		l2 = l2.Next
 	}
 
-	for j < len(nums2) {
-		numMerged[k] = nums2[j]
-		j++
-		k++
+	if reserved > 0 {
+		currentNode.Next = &ListNode{}
+		currentNode = currentNode.Next
+		currentNode.Val = reserved
 	}
 
-	if len(numMerged)%2 == 0 {
-		return float64(numMerged[(len(numMerged)-1)/2])/2 + float64(numMerged[len(numMerged)/2])/2
-	}
-	return float64(numMerged[len(numMerged)/2])
+	return listHead.Next
 }

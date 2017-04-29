@@ -15,6 +15,10 @@ var settings = mysql.ConnectionURL{
 	Database: "card_shop",
 	User:     "root",
 	Password: "",
+	// connection timeout
+	// read timeout
+	// write timeout
+	Options: map[string]string{},
 }
 
 // Card is
