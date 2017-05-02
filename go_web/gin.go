@@ -131,6 +131,19 @@ func main() {
 		v2.POST("/submit", handler)
 		v2.POST("/read", handler)
 	}
+	r.GET("/post/:id", func(c *gin.Context) {
+		fmt.Println(c.Param("id"))
+		fmt.Println("post id")
+	})
+
+	r.GET("/post/:id/reply/add", func(c *gin.Context) {
+		fmt.Println(c.Param("id"))
+		fmt.Println("post id reply add")
+	})
+	r.POST("/post/add", func(c *gin.Context) {
+		fmt.Println("post add")
+	})
 
 	r.Run() // listen and server on 0.0.0.0:8080
+
 }
