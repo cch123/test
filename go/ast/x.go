@@ -5,6 +5,7 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"strings"
 )
 
 func main() {
@@ -16,6 +17,16 @@ func main() {
 		ast.Print(fset, d)
 	}
 
-	fmt.Printf("%#v",f.Decls[0].(*ast.GenDecl).Specs[0].(*ast.TypeSpec).Type.(*ast.StructType).Fields.List[0].Tag.Value)
+	fmt.Printf("%#v\n", f.Decls[0].(*ast.GenDecl).Specs[0].(*ast.TypeSpec).Type.(*ast.StructType).Fields.List[0].Tag.Value)
+	str := f.Decls[0].(*ast.GenDecl).Specs[0].(*ast.TypeSpec).Type.(*ast.StructType).Fields.List[0].Tag.Value
+	str = strings.Trim(strings.Trim(str, "\""), "`")
+	fmt.Println(str)
+	arr := strings.Split(str, " ")
+	fmt.Println(strings.Split(str, " "))
+	for _, v := range arr {
+		fmt.Println(v)
+		fmt.Println(strings.Split(v, ":")[0])
+		fmt.Println(strings.Split(v, ":")[1])
+	}
 	//.(*ast.TypeSpec.Type.(*ast.StructType).Fields[0].(*ast.FieldList).List[0].Tag))
 }
