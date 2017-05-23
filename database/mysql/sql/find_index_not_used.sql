@@ -1,3 +1,5 @@
+5.6:
+performance_schem
 SELECT
   object_schema,
   object_name,
@@ -9,3 +11,7 @@ AND SUM_TIMER_INSERT = 0
 AND SUM_TIMER_INSERT = 0
 AND SUM_TIMER_UPDATE = 0
 AND SUM_TIMER_DELETE = 0;
+
+5.7:
+sys
+select * from schema_unused_indexes;
