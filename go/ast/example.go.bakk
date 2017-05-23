@@ -1,0 +1,11 @@
+package lp
+
+var a = 1
+
+const a = 1
+
+type p struct {
+}
+
+func main() {
+}
