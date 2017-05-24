@@ -1,0 +1,7 @@
+package main
+
+// for api @post @/user/create
+type createAccountRequest struct {
+	Age  int    `form:"age" validation:"gte=18"`
+	Name string `form:"name" validation:"length>0"`
+}
