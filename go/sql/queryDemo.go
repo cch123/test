@@ -15,7 +15,7 @@ type Person struct {
 }
 
 func main() {
-	db, err := sql.Open("mysql", "root:123456@/test")
+	db, err := sql.Open("mysql", "root:@/test")
 	if err != nil {
 		fmt.Printf("%+v\n", err)
 		return

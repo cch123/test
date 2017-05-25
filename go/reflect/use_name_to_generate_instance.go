@@ -29,8 +29,9 @@ func main() {
 	fmt.Printf("%#v\n", p)
 	fmt.Printf("%#v\n", d)
 	// 反射出来的东西也只能通过反射的方式set给别的变量么。。
-	var q *Person
-	fmt.Println(a["person"].AssignableTo(reflect.TypeOf(q)))
+	var q = &Person{}
+	// assignableTo 和 Set 的关系。。
+	fmt.Println(reflect.TypeOf(p).AssignableTo(reflect.TypeOf(q)))
 	qElem := reflect.ValueOf(&q).Elem()
 	qElem.Set(p)
 	fmt.Printf("%#v", q)
