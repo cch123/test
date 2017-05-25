@@ -19,6 +19,7 @@ func main() {
 		i++
 	}
 	fmt.Println("for loop end")
+	//fmt.Println(i)
 	time.Sleep(time.Second * 3600)
 }
 
