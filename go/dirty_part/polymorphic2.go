@@ -38,5 +38,5 @@ func main() {
         }`
 	req := request{}
 	json.Unmarshal([]byte(jsonStr), &req)
-	fmt.Println(req)
+	fmt.Printf("%#v\n", req)
 }
