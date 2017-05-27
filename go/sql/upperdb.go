@@ -71,13 +71,17 @@ func main() {
 	// https://github.com/upper/db/issues/357
 	q = sess.Select("id", "name").From("card").
 		Where(
-		db.And(
-			db.Cond{"id > ": 0},
-			db.Or(
-				db.Cond{"name > ": "小"},
-				db.Cond{"name <": "白"},
-			),
-		))
+			db.And(
+				db.Cond{"id > ": 0},
+				db.Or(
+					db.Cond{"name > ": "小"},
+					db.Cond{"name <": "白"},
+				),
+			))
+
+	//妹的这个也可以，那我还为什么要写select from
+	fields := []interface{}{"*"}
+	q = sess.Select(fields...).From("card").Where("id > ?", 0)
 	q.All(&cards)
 	q.One(&c)
 	q.All(&cardMapList)
