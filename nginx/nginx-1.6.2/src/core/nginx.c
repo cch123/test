@@ -212,13 +212,17 @@ main(int argc, char *const *argv)
         return 1;
     }
 
+    // 获取启动参数 -h ，-xx之类的
     if (ngx_get_options(argc, argv) != NGX_OK) {
         return 1;
     }
 
+    // 上面 ngx_get_option 的时候会修改这个全局变量
     if (ngx_show_version) {
+        // 往 stderr 里写字符串，不过这个 fd 竟然不是固定的前三个中的其中一个？？
         ngx_write_stderr("nginx version: " NGINX_VER NGX_LINEFEED);
 
+        // 也是前面ngx_get_options 里读入的变量
         if (ngx_show_help) {
             ngx_write_stderr(
                 "Usage: nginx [-?hvVtq] [-s signal] [-c filename] "
@@ -235,6 +239,7 @@ main(int argc, char *const *argv)
                 "  -s signal     : send signal to a master process: "
                                    "stop, quit, reopen, reload" NGX_LINEFEED
 #ifdef NGX_PREFIX
+// 这些 ifdef 应该都是在 configure 期间生成的宏~
                 "  -p prefix     : set prefix path (default: "
                                    NGX_PREFIX ")" NGX_LINEFEED
 #else
@@ -275,6 +280,8 @@ main(int argc, char *const *argv)
     ngx_regex_init();
 #endif
 
+    // #define ngx_getpid   getpid
+    // 就是 c 函数
     ngx_pid = ngx_getpid();
 
     log = ngx_log_init(ngx_prefix);
@@ -296,11 +303,13 @@ main(int argc, char *const *argv)
     init_cycle.log = log;
     ngx_cycle = &init_cycle;
 
+    // 创建 nginx 的内存池
     init_cycle.pool = ngx_create_pool(1024, log);
     if (init_cycle.pool == NULL) {
         return 1;
     }
 
+    // 把启动变量赋值给全局变量，应该之后在各子进程/线程中能读得到
     if (ngx_save_argv(&init_cycle, argc, argv) != NGX_OK) {
         return 1;
     }
@@ -321,6 +330,7 @@ main(int argc, char *const *argv)
         return 1;
     }
 
+    // TODO 没看明白
     if (ngx_add_inherited_sockets(&init_cycle) != NGX_OK) {
         return 1;
     }
@@ -383,6 +393,7 @@ main(int argc, char *const *argv)
 
 #endif
 
+    // 创建当前进程的 pid file，写入到某个文件吧
     if (ngx_create_pidfile(&ccf->pid, cycle->log) != NGX_OK) {
         return 1;
     }
@@ -400,6 +411,7 @@ main(int argc, char *const *argv)
 
     ngx_use_stderr = 0;
 
+    // 这里开始进入正儿八经的事件循环~
     if (ngx_process == NGX_PROCESS_SINGLE) {
         ngx_single_process_cycle(cycle);
 
