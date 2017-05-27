@@ -8,6 +8,8 @@ import (
 func main() {
 	var a = []int{1, 2, 3}
 	var b interface{} = a
+	fmt.Println(reflect.TypeOf(a))
+	fmt.Println(reflect.TypeOf(b))
 	fmt.Println(reflect.TypeOf(&a))
 	fmt.Println(reflect.TypeOf(&b))
 
