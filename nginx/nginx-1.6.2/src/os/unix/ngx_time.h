@@ -58,6 +58,8 @@ void ngx_localtime(time_t s, ngx_tm_t *tm);
 void ngx_libc_localtime(time_t s, struct tm *tm);
 void ngx_libc_gmtime(time_t s, struct tm *tm);
 
+// 整个 nginx启动、work 启动、收到系统信号的时候才会调用这个 gettimeofday 的 sys call
+// 不会每次处理请求的时候来调用，所以调用次数非常少
 #define ngx_gettimeofday(tp)  (void) gettimeofday(tp, NULL);
 #define ngx_msleep(ms)        (void) usleep(ms * 1000)
 #define ngx_sleep(s)          (void) sleep(s)

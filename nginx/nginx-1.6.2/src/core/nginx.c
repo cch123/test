@@ -186,9 +186,10 @@ ngx_module_t  ngx_core_module = {
 
 ngx_uint_t          ngx_max_module;
 
-static ngx_uint_t   ngx_show_help;
-static ngx_uint_t   ngx_show_version;
-static ngx_uint_t   ngx_show_configure;
+// 静态全局变量，启动的时候读取参数修改的~
+static ngx_uint_t   ngx_show_help; // 是否显示帮助
+static ngx_uint_t   ngx_show_version; // 是否展示 nginx 版本
+static ngx_uint_t   ngx_show_configure; // 
 static u_char      *ngx_prefix;
 static u_char      *ngx_conf_file;
 static u_char      *ngx_conf_params;
@@ -224,6 +225,7 @@ main(int argc, char *const *argv)
 
         // 也是前面ngx_get_options 里读入的变量
         if (ngx_show_help) {
+            // 其实我不太明白为啥很多程序默认情况下会优先写 stderr
             ngx_write_stderr(
                 "Usage: nginx [-?hvVtq] [-s signal] [-c filename] "
                              "[-p prefix] [-g directives]" NGX_LINEFEED
@@ -252,6 +254,9 @@ main(int argc, char *const *argv)
                 );
         }
 
+        // -V
+        // 赋值也是在 ngx_get_options 里
+        // show configure 只会在这一步被读取，毕竟输出 configure 的各种值嘛
         if (ngx_show_configure) {
             ngx_write_stderr(
 #ifdef NGX_COMPILER
@@ -267,6 +272,9 @@ main(int argc, char *const *argv)
                 "configure arguments:" NGX_CONFIGURE NGX_LINEFEED);
         }
 
+        // 使用 -t 输入，在 ngx_get_options 里设置的全局变量
+        // 如果是 test config 还要继续往下走，测试端口是否可用，cycle能不能初始化
+        // 看起来就是各种资源能不能根据 config 里的值初始化成功~
         if (!ngx_test_config) {
             return 0;
         }
@@ -277,11 +285,13 @@ main(int argc, char *const *argv)
     ngx_time_init();
 
 #if (NGX_PCRE)
+	// 只是修改了 pcre_malloc 和 pcre_free 两个全局的函数指针
+	// 在处理 pcre 正则的时候由 nginx 接管内存分配和释放
     ngx_regex_init();
 #endif
 
     // #define ngx_getpid   getpid
-    // 就是 c 函数
+    // 就是封装了 getpid 的 sys call 调用
     ngx_pid = ngx_getpid();
 
     log = ngx_log_init(ngx_prefix);
@@ -299,6 +309,7 @@ main(int argc, char *const *argv)
      * ngx_process_options()
      */
 
+    // memset，0, n 的封装，为了少写一个参数方便一些吧
     ngx_memzero(&init_cycle, sizeof(ngx_cycle_t));
     init_cycle.log = log;
     ngx_cycle = &init_cycle;
@@ -309,7 +320,7 @@ main(int argc, char *const *argv)
         return 1;
     }
 
-    // 把启动变量赋值给全局变量，应该之后在各子进程/线程中能读得到
+    // 把启动程序的 argv, argc 之类的东西赋值给全局变量，应该之后在各子进程/线程中能读得到
     if (ngx_save_argv(&init_cycle, argc, argv) != NGX_OK) {
         return 1;
     }
@@ -318,6 +329,7 @@ main(int argc, char *const *argv)
         return 1;
     }
 
+    // os, cpu 相关的一些初始化
     if (ngx_os_init(log) != NGX_OK) {
         return 1;
     }
@@ -326,6 +338,7 @@ main(int argc, char *const *argv)
      * ngx_crc32_table_init() requires ngx_cacheline_size set in ngx_os_init()
      */
 
+    // 顾名思义。。
     if (ngx_crc32_table_init() != NGX_OK) {
         return 1;
     }
@@ -695,6 +708,7 @@ ngx_get_options(int argc, char *const *argv)
 
             switch (*p++) {
 
+			// 写的很美好，但是 mac 下的 -? 根本不生效
             case '?':
             case 'h':
                 ngx_show_version = 1;
@@ -707,10 +721,12 @@ ngx_get_options(int argc, char *const *argv)
 
             case 'V':
                 ngx_show_version = 1;
+				// show configure 只在这里被修改
                 ngx_show_configure = 1;
                 break;
 
             case 't':
+				// test config 只有输入 -t flag的时候才会变成1
                 ngx_test_config = 1;
                 break;
 

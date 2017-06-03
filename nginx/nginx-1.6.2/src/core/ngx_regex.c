@@ -72,6 +72,11 @@ static ngx_list_t  *ngx_pcre_studies;
 void
 ngx_regex_init(void)
 {
+	// 下面是从 man page 里抄出来的
+	// The global variables pcre_malloc and pcre_free initially contain the entry points of the standard malloc() and free() functions respectively.
+	// PCRE calls the memory management functions via these variables, 
+	// so a calling program can replace them if it wishes to intercept the calls.
+	// This should be done before calling any PCRE functions.
     pcre_malloc = ngx_regex_malloc;
     pcre_free = ngx_regex_free;
 }

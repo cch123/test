@@ -181,6 +181,8 @@ ngx_log_error(ngx_uint_t level, ngx_log_t *log, ngx_err_t err,
     va_list  args;
 
     if (log->log_level >= level) {
+        // va_start, va_end 之类的东西是在 c 里提供可变参数的功能用的
+        // http://www.cnblogs.com/hanyonglu/archive/2011/05/07/2039916.html
         va_start(args, fmt);
         ngx_log_error_core(level, log, err, fmt, args);
         va_end(args);

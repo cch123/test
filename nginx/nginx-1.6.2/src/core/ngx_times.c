@@ -84,6 +84,7 @@ ngx_time_update(void)
         return;
     }
 
+    // 封装系统的 gettimeofday sys call
     ngx_gettimeofday(&tv);
 
     sec = tv.tv_sec;

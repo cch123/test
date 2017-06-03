@@ -42,7 +42,11 @@ ngx_os_init(ngx_log_t *log)
 
     ngx_init_setproctitle(log);
 
+    // getpagesize 是 linux 函数
     ngx_pagesize = getpagesize();
+    // 介个似乎是获取和 cpu 相关的，不过暂时不知道这个 NGX_CPU_CACHE_LINE全局变量是在哪里初始化的呢
+    // 全局搜索没有搜索到
+    // 估计是 configure 期间获取到的吧
     ngx_cacheline_size = NGX_CPU_CACHE_LINE;
 
     for (n = ngx_pagesize; n >>= 1; ngx_pagesize_shift++) { /* void */ }
@@ -57,6 +61,7 @@ ngx_os_init(ngx_log_t *log)
         ngx_ncpu = 1;
     }
 
+    //
     ngx_cpuinfo();
 
     if (getrlimit(RLIMIT_NOFILE, &rlmt) == -1) {
@@ -88,6 +93,7 @@ ngx_os_status(ngx_log_t *log)
     ngx_log_error(NGX_LOG_NOTICE, log, 0, "built by " NGX_COMPILER);
 #endif
 
+// configure 了之后估计才有的东西
 #if (NGX_HAVE_OS_SPECIFIC_INIT)
     ngx_os_specific_status(log);
 #endif
