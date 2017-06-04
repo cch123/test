@@ -161,6 +161,7 @@ static ngx_command_t  ngx_core_commands[] = {
 };
 
 
+// nginx 的 core 模块的名字、创建 config 的函数，初始化 config 的函数
 static ngx_core_module_t  ngx_core_module_ctx = {
     ngx_string("core"),
     ngx_core_module_create_conf,
@@ -191,7 +192,7 @@ static ngx_uint_t   ngx_show_help; // 是否显示帮助
 static ngx_uint_t   ngx_show_version; // 是否展示 nginx 版本
 static ngx_uint_t   ngx_show_configure; // 
 static u_char      *ngx_prefix;
-static u_char      *ngx_conf_file;
+static u_char      *ngx_conf_file; // nginx -c xxx.conf 时读取进来的文件名
 static u_char      *ngx_conf_params;
 static char        *ngx_signal;
 
@@ -292,6 +293,7 @@ main(int argc, char *const *argv)
 
     // #define ngx_getpid   getpid
     // 就是封装了 getpid 的 sys call 调用
+    // getpid 返回的是进程 id， 也可以叫线程组 id，体会一下
     ngx_pid = ngx_getpid();
 
     log = ngx_log_init(ngx_prefix);
@@ -320,11 +322,12 @@ main(int argc, char *const *argv)
         return 1;
     }
 
-    // 把启动程序的 argv, argc 之类的东西赋值给全局变量，应该之后在各子进程/线程中能读得到
+    // 把启动程序的 argv, argc 赋值给全局变量，应该之后在各子进程/线程中能读得到
     if (ngx_save_argv(&init_cycle, argc, argv) != NGX_OK) {
         return 1;
     }
 
+    // 初始化 config 文件路径之类的变量，也没啥好说的
     if (ngx_process_options(&init_cycle) != NGX_OK) {
         return 1;
     }
@@ -349,10 +352,14 @@ main(int argc, char *const *argv)
     }
 
     ngx_max_module = 0;
+    // 没看明白
     for (i = 0; ngx_modules[i]; i++) {
         ngx_modules[i]->index = ngx_max_module++;
     }
 
+    // 800 行的初始化函数。。
+    // 各种初始化工作都在这里面做
+    // 内存池，config，共享内存等等
     cycle = ngx_init_cycle(&init_cycle);
     if (cycle == NULL) {
         if (ngx_test_config) {
@@ -382,6 +389,26 @@ main(int argc, char *const *argv)
 
     ccf = (ngx_core_conf_t *) ngx_get_conf(cycle->conf_ctx, ngx_core_module);
 
+    // master flag 是在 ngx_core_module_init_conf 里初始化的
+    // 即 core 模块初始化时，为 ccf->master 赋值
+    // http://blog.csdn.net/benbendy1984/article/details/6008581
+    /*
+    一 maste or single 
+    nginx 可以单个进程工作，也可以 master+ worker模式工作，所以当使用前者模式启动的时候，进程就是NGX_PROCESS_SINGLE ; 当使用后者的时候，那么父进程就是 NGX_PROCESS_MASTER,而子进程就是 NGX_PROCESS_WORKER。使用哪种模式可以在配置文件中设置，默认使用后者，如果配置文件中 masterprocess off 开启，那么就使用了前者。
+    ngx_process 初始值是0，也就是NGX_PROCESS_SINGLE,在 main 函数中：
+    if (ccf->master && ngx_process == NGX_PROCESS_SINGLE) {
+        ngx_process = NGX_PROCESS_MASTER;
+    }
+    也就是核心模块中的master设置了，并且进程类型还未初始化，那么当前进程就是master进程。
+
+    我们看ccf->master 这个变量是在核心模块配置的初始化中，默认设置为1：
+    ngx_conf_init_value(ccf->master, 1);
+    因此，整个系统默认就是master模式，只有在配置中masterprocess off 才是single模式。
+    二  signal
+    当我们需要关闭、重启等操作的时候，需要向工作中的进程发送信号，谁来发呢，这个进程就是 NGX_PROCESS_SIGNALLER
+    */
+    
+    // 如上 ngx_process 默认值是 0
     if (ccf->master && ngx_process == NGX_PROCESS_SINGLE) {
         ngx_process = NGX_PROCESS_MASTER;
     }
@@ -425,10 +452,12 @@ main(int argc, char *const *argv)
     ngx_use_stderr = 0;
 
     // 这里开始进入正儿八经的事件循环~
+    // 单进程模式
     if (ngx_process == NGX_PROCESS_SINGLE) {
         ngx_single_process_cycle(cycle);
 
     } else {
+        // master/worker 模式
         ngx_master_process_cycle(cycle);
     }
 
@@ -886,16 +915,20 @@ ngx_process_options(ngx_cycle_t *cycle)
 
 #ifndef NGX_PREFIX
 
+        // 从函数名推断，是从 pool 里获取指定大小的内存的操作
         p = ngx_pnalloc(cycle->pool, NGX_MAX_PATH);
         if (p == NULL) {
             return NGX_ERROR;
         }
 
+        // getcwd 是一个 c 库函数，get current working directory
+        // 不是 sys call
         if (ngx_getcwd(p, NGX_MAX_PATH) == 0) {
             ngx_log_stderr(ngx_errno, "[emerg]: " ngx_getcwd_n " failed");
             return NGX_ERROR;
         }
 
+        // strlen 封装，参数为 const char *
         len = ngx_strlen(p);
 
         p[len++] = '/';
@@ -917,14 +950,18 @@ ngx_process_options(ngx_cycle_t *cycle)
 #endif
     }
 
+    
     if (ngx_conf_file) {
         cycle->conf_file.len = ngx_strlen(ngx_conf_file);
         cycle->conf_file.data = ngx_conf_file;
 
     } else {
+        // 没有 -c 的话就读默认的路径
         ngx_str_set(&cycle->conf_file, NGX_CONF_PATH);
     }
 
+    // 看看 -c 后面提供的文件名是不是一个绝对路径
+    // 如果不是的话，获取这个完整的绝对路径
     if (ngx_conf_full_name(cycle, &cycle->conf_file, 0) != NGX_OK) {
         return NGX_ERROR;
     }

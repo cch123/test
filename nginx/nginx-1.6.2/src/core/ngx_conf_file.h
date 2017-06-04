@@ -136,6 +136,10 @@ struct ngx_module_s {
 };
 
 
+// 每个模块都有三个要素
+// 1.模块名
+// 2.创建 config 的函数
+// 3.初始化 config 的函数
 typedef struct {
     ngx_str_t             name;
     void               *(*create_conf)(ngx_cycle_t *cycle);

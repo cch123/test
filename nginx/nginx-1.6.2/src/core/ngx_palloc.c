@@ -13,6 +13,7 @@ static void *ngx_palloc_block(ngx_pool_t *pool, size_t size);
 static void *ngx_palloc_large(ngx_pool_t *pool, size_t size);
 
 
+// 抽时间总结一下内存池的初始化和使用过程，写篇文
 ngx_pool_t *
 ngx_create_pool(size_t size, ngx_log_t *log)
 {

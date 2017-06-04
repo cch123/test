@@ -272,6 +272,8 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
                        cycle->conf_file.data);
     }
 
+    // 循环初始化每一个模块的 config
+    // 这个 ngx_modules 的全局变量大概也是 ./configure 出来才有的。。。
     for (i = 0; ngx_modules[i]; i++) {
         if (ngx_modules[i]->type != NGX_CORE_MODULE) {
             continue;
@@ -279,7 +281,10 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
 
         module = ngx_modules[i]->ctx;
 
+        // 如果模块的 init_conf 函数指针不为空，那么点点点
         if (module->init_conf) {
+            // 调用 init_conf 函数
+            // TODO 疑问，core 模块是在这里初始化的么？
             if (module->init_conf(cycle, cycle->conf_ctx[ngx_modules[i]->index])
                 == NGX_CONF_ERROR)
             {
@@ -290,6 +295,8 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
         }
     }
 
+    // 如果是处理信号的进程，直接返回 cycle
+    // TODO 什么时候才会有这个处理信号的进程？
     if (ngx_process == NGX_PROCESS_SIGNALLER) {
         return cycle;
     }
@@ -308,6 +315,7 @@ ngx_init_cycle(ngx_cycle_t *old_cycle)
          * we do not create the pid file in the first ngx_init_cycle() call
          * because we need to write the demonized process pid
          */
+        // 涉及到守护进程的原理
 
         old_ccf = (ngx_core_conf_t *) ngx_get_conf(old_cycle->conf_ctx,
                                                    ngx_core_module);

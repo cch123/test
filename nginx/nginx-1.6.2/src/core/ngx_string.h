@@ -13,6 +13,7 @@
 #include <ngx_core.h>
 
 
+// 保存了长度的字符串，类似于 sds
 typedef struct {
     size_t      len;
     u_char     *data;
