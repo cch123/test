@@ -13,3 +13,9 @@ func BenchmarkB(b *testing.B) {
 		TestB()
 	}
 }
+
+func BenchmarkC(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		TestC()
+	}
+}
