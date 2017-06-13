@@ -17,3 +17,7 @@ print today
 print yearAgo
 daysAfter = (now + delta).strftime("%Y-%m-%d 00:00:00")
 print daysAfter
+
+dt = datetime.datetime.strptime("2007-03-04 21:08:12", "%Y-%m-%d %H:%M:%S")
+print dt.year
+
