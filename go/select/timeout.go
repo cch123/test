@@ -15,12 +15,12 @@ func readChannel(dataChan chan int) {
 func main() {
 	timeoutChan := time.After(3 * time.Second)
 	dataChan := make(chan int, 100)
-	needReadSignalChannel := make(chan struct{})
+	minNeedReadAmountNotifyChan := make(chan struct{})
 	go func() {
 		for i := 0; i < 1000; i++ {
 			dataChan <- i
 			if len(dataChan) > 50 {
-				needReadSignalChannel <- struct{}{}
+				minNeedReadAmountNotifyChan <- struct{}{}
 			}
 		}
 	}()
@@ -34,7 +34,7 @@ func main() {
 			// 实际上每次 select 都会生成新的 timer
 			timeoutChan = time.After(3 * time.Second)
 			println("timeout")
-		case <-needReadSignalChannel:
+		case <-minNeedReadAmountNotifyChan:
 			readChannel(dataChan)
 		}
 	}
