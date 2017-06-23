@@ -110,9 +110,16 @@ func buildGroupByFuncDateRange(fieldName string, dateRangeAlias string, format s
 }
 
 // 可以并列在最内部的aggregation列表中
-func buildSelectFuncObj(funcName string, fieldname string) H {
+func buildSelectFuncObj(funcName string, fieldName string, distinct bool) H {
 	switch funcName {
 	case "count":
+		if distinct == true {
+			return H{
+				"cardinality": H{
+					"field": fieldName,
+				},
+			}
+		}
 		return H{
 			"value_count": H{
 				"field": "_index",
@@ -121,7 +128,7 @@ func buildSelectFuncObj(funcName string, fieldname string) H {
 	default:
 		return H{
 			funcName: H{
-				"field": fieldname,
+				"field": fieldName,
 			},
 		}
 	}
