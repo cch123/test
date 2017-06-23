@@ -30,6 +30,8 @@ func main() {
 		select {
 		case <-timeoutChan:
 			readChannel(dataChan)
+			// 如果直接在 case 上写 time.After 的话
+			// 实际上每次 select 都会生成新的 timer
 			timeoutChan = time.After(3 * time.Second)
 			println("timeout")
 		case <-needReadSignalChannel:
