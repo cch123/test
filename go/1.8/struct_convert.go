@@ -19,11 +19,11 @@ type PersonVo struct {
 }
 
 func main() {
-	v := PersonVo{1, "aa", 1}
+	v := PersonVo{1, 2, "aa"}
 	// 1.7
-	d := Person{v.age, v.name, v.height}
+	d := Person{v.age, v.height, v.name}
 	// 1.8
-	d2 := Person{v}
+	d2 := Person(v)
 	fmt.Println("%#v", d)
 	fmt.Println("%#v", d2)
 }
