@@ -18,4 +18,6 @@ func main() {
 	fmt.Println(a)
 	sort.Slice(a, func(i, j int) bool { return a[i].name < a[j].name })
 	fmt.Println(a)
+
+	// 稳定排序 sort.SliceStable()
 }
