@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	f, err := os.OpenFile("./tmp/cpu.prof", os.O_RDWR|os.O_CREATE, 0644)
+	f, err := os.OpenFile("./cpu.prof", os.O_RDWR|os.O_CREATE, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
