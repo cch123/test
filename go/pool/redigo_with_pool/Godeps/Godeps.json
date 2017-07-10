@@ -1,0 +1,45 @@
+{
+	"ImportPath": "cch/ff",
+	"GoVersion": "go1.8",
+	"GodepVersion": "v79",
+	"Deps": [
+		{
+			"ImportPath": "github.com/garyburd/redigo/internal",
+			"Comment": "v1.0.0-14-g9574733",
+			"Rev": "957473377c7765670d0b656e99eafe7b8669f213"
+		},
+		{
+			"ImportPath": "github.com/garyburd/redigo/redis",
+			"Comment": "v1.0.0-14-g9574733",
+			"Rev": "957473377c7765670d0b656e99eafe7b8669f213"
+		},
+		{
+			"ImportPath": "github.com/golang/glog",
+			"Rev": "23def4e6c14b4da8ac2ed8007337bc5eb5007998"
+		},
+		{
+			"ImportPath": "github.com/youtube/vitess/go/acl",
+			"Comment": "v2.1.0-alpha.1-1379-g6bb52c166",
+			"Rev": "6bb52c16687e2b1b5226180312fe6dfe8d37ce65"
+		},
+		{
+			"ImportPath": "github.com/youtube/vitess/go/cache",
+			"Comment": "v2.1.0-alpha.1-1379-g6bb52c166",
+			"Rev": "6bb52c16687e2b1b5226180312fe6dfe8d37ce65"
+		},
+		{
+			"ImportPath": "github.com/youtube/vitess/go/pools",
+			"Comment": "v2.1.0-alpha.1-1379-g6bb52c166",
+			"Rev": "6bb52c16687e2b1b5226180312fe6dfe8d37ce65"
+		},
+		{
+			"ImportPath": "github.com/youtube/vitess/go/sync2",
+			"Comment": "v2.1.0-alpha.1-1379-g6bb52c166",
+			"Rev": "6bb52c16687e2b1b5226180312fe6dfe8d37ce65"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context",
+			"Rev": "054b33e6527139ad5b1ec2f6232c3b175bd9a30c"
+		}
+	]
+}
