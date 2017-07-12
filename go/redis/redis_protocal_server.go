@@ -18,12 +18,12 @@ func main() {
 	})
 	srv.HandleFunc("set", func(w resp.ResponseWriter, _ *resp.Command) {
 		w.AppendArrayLen(2)
-		w.AppendBulkString("1")
-		w.AppendBulkString("1")
+		w.AppendInlineString("a")
+		w.AppendInt(5)
 	})
 
 	// Open a new listener
-	lis, err := net.Listen("tcp", ":9736")
+	lis, err := net.Listen("tcp", ":9999")
 	if err != nil {
 		panic(err)
 	}
