@@ -1,0 +1,23 @@
+// Place your settings in this file to overwrite the default settings
+{
+    "go.buildOnSave": "package",
+    "go.lintOnSave": "package",
+    "go.vetOnSave": "package",
+    "go.formatTool": "goimports",
+    "go.gopath": "/Users/Xargin/go",
+    "editor.fontSize": 16,
+    "window.zoomLevel": 0,
+    "workbench.iconTheme": "vs-minimal",
+    "workbench.colorTheme": "Solarized Dark",
+    "vim.disableAnnoyingNeovimMessage": true,
+    "vim.otherModesKeyBindings": [
+        {
+            "before":["H"],
+            "after" : ["^"]
+        },
+        {
+            "before":["L"],
+            "after" : ["$"]
+        }
+    ]
+}
