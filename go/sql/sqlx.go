@@ -22,9 +22,16 @@ func main() {
 	//	}
 
 	//err = db.NamedQuery(&cards, "select * from card where id > :id", map[string]interface{}{"id": "80"})
-	ft, args, err := sqlx.Named("select * from card where id > :id", map[string]interface{}{"id": 1})
-	//fmt.Println(fmt, args, err)
-	fmt.Println(ft, args[0].(int), err)
+	m := map[string]interface{}{
+		"id":  10,
+		"ids": []int{78, 79, 80},
+	}
+
+	//可以封装一次，在这里一次搞定
+	ft, args, err := sqlx.Named("select * from card where id > :id and id in (:ids)", m)
+	ft, args, err = sqlx.In(ft, args...)
+
+	fmt.Println(ft, args, err)
 	err = db.Select(&cards, ft, args...)
 	if err != nil {
 		fmt.Println(err)
