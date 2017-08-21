@@ -3,9 +3,9 @@ package main
 import (
 	"io"
 	"log"
-	"net/http"
+	_ "net/http/pprof"
 
-	"github.com/google/gops/agent"
+	"net/http"
 )
 
 func sayhello(wr http.ResponseWriter, r *http.Request) {
@@ -13,13 +13,12 @@ func sayhello(wr http.ResponseWriter, r *http.Request) {
 	// 蛋疼
 	//	wr.WriteHeader(404)
 	io.WriteString(wr, "hello")
+	panic(1)
+
 	//	fmt.Println(wr.Header())
 }
 
 func main() {
-	if err := agent.Listen(nil); err != nil {
-		log.Fatal(err)
-	}
 	http.HandleFunc("/", sayhello)
 	err := http.ListenAndServe(":9090", nil)
 	if err != nil {
