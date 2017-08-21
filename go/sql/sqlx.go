@@ -29,6 +29,7 @@ func main() {
 
 	//可以封装一次，在这里一次搞定
 	ft, args, err := sqlx.Named("select * from card where id > :id and id in (:ids)", m)
+	fmt.Println(ft, args, err)
 	ft, args, err = sqlx.In(ft, args...)
 
 	fmt.Println(ft, args, err)
