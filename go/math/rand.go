@@ -15,4 +15,7 @@ func main() {
 		y := random.Intn(100)
 		println("true", y)
 	}
+
+	// 如果为 0，会 panic
+	rand.Intn(0)
 }
