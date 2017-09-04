@@ -15,7 +15,7 @@ func main() {
 	if err := mu.Start(0x1000, 0x1000+uint64(len(code))); err != nil {
 		panic(err)
 	}
-	err := mu.RegWrite(uc.X86_REG_R10, 1031)
+	err := mu.RegWrite(uc.X86_REG_R10, 10101010101010101010)
 	fmt.Println(err)
 	eax, _ := mu.RegRead(uc.X86_REG_EAX)
 	r10, err := mu.RegRead(uc.X86_REG_R10)
