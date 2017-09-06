@@ -7,7 +7,7 @@ func main() {
 	go func() {
 		for i := 0; i < 100; i++ {
 			ch <- 1
-			time.Sleep(time.Second)
+			time.Sleep(time.Millisecond)
 		}
 	}()
 
