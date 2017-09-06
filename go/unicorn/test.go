@@ -9,10 +9,17 @@ import (
 func main() {
 	mu, _ := uc.NewUnicorn(uc.ARCH_X86, uc.MODE_64)
 	// mov eax, 1234
-	code := []byte{184, 210, 4, 0, 0}
-	mu.MemMap(0x1000, 0x1000)
-	mu.MemWrite(0x1000, code)
-	if err := mu.Start(0x1000, 0x1000+uint64(len(code))); err != nil {
+	//code := []byte{184, 210, 4, 0, 0}
+	code := []byte{58}
+	mu.MemMap(0x000000, 2*1024*1024)
+	mu.MemWrite(0x000000, code)
+	//mu.MemMap(0x2000000, 2*1024*1024)
+	mu.RegWrite(uc.X86_REG_RSP, 0x200000)
+	rsp, _ := mu.RegRead(uc.X86_REG_RSP)
+	fmt.Println(rsp)
+	rbp, _ := mu.RegRead(uc.X86_REG_RBP)
+	fmt.Println(rbp)
+	if err := mu.Start(0x1000000, 0x1000000+uint64(len(code))); err != nil {
 		panic(err)
 	}
 	err := mu.RegWrite(uc.X86_REG_R10, 10101010101010101010)
