@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net"
 
 	"github.com/bsm/redeo"
@@ -10,16 +11,26 @@ import (
 func main() {
 	// Init server and define handlers
 	srv := redeo.NewServer(nil)
-	srv.HandleFunc("ping", func(w resp.ResponseWriter, _ *resp.Command) {
-		w.AppendInlineString("PONG")
+
+	srv.HandleFunc("lpush", func(w resp.ResponseWriter, cmd *resp.Command) {
+		if cmd.ArgN() < 2 {
+			w.AppendError("lacking param")
+			return
+		}
+
+		msgQueue := cmd.Arg(0)
+		msg := cmd.Arg(1)
+		// use this msg to do some msg queue stuff
+		fmt.Println("queue: ", msgQueue, ", msg: ", msg)
+
+		// ... succeed, then give response
+		w.AppendOK()
 	})
-	srv.HandleFunc("info", func(w resp.ResponseWriter, _ *resp.Command) {
-		w.AppendBulkString(srv.Info().String())
-	})
-	srv.HandleFunc("set", func(w resp.ResponseWriter, _ *resp.Command) {
-		w.AppendArrayLen(2)
-		w.AppendInlineString("a")
-		w.AppendInt(5)
+
+	srv.HandleFunc("rpop", func(w resp.ResponseWriter, cmd *resp.Command) {
+		// msg := fetch one msg from your message queue
+		fakeMsg := "yes, this msg is fetched from msg queue"
+		w.AppendInlineString(fakeMsg)
 	})
 
 	// Open a new listener
@@ -29,6 +40,5 @@ func main() {
 	}
 	defer lis.Close()
 
-	// Start serving (blocking)
 	srv.Serve(lis)
 }
