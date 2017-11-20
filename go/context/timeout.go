@@ -7,24 +7,15 @@ import (
 )
 
 func test(ctx context.Context) {
-	// must support ctx
-	for {
-		select {
-		case <-ctx.Done():
-			fmt.Println("timeout")
-			return
-		default:
-		}
-		fmt.Println("do some thing")
-		time.Sleep(time.Millisecond)
-	}
+	fmt.Println("slow start")
+	time.Sleep(time.Second * 2)
+	fmt.Println("slow done")
 }
 
 func main() {
 
-	ctx, cancel := context.WithTimeout(context.TODO(), time.Millisecond*4)
-	test(ctx)
-	defer cancel()
+	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*2)
+	go test(ctx)
 	select {
 	case <-time.After(time.Second):
 		fmt.Println("yesyes")
@@ -33,4 +24,5 @@ func main() {
 		fmt.Println("nono")
 	}
 	fmt.Println(ctx)
+	time.Sleep(time.Second * 2)
 }
