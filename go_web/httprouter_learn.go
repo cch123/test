@@ -13,7 +13,7 @@ func Hello(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 func main() {
 	r := httprouter.New()
-	r.GET("/hello/over/:fuc/set/:name/:id", Hello)
+	r.GET("/hello/over/:fuc/set/:name/:id/ohyea/", Hello)
 	//r.GET("/hello/:fuc/:name", Hello)
 	//	r.GET("/hello/fuci/:name", Hello)
 	httprouter.WalkPrint(r, "GET")
