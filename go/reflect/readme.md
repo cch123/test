@@ -1,9 +1,13 @@
 # reflect
 
 reflect.TypeOf => 具体类型
+
 reflect.TypeOf.Kind => 总体类型，例如是 struct，还是 map，还是 int 什么的。
+
 reflect.ValueOf => 获取 Value，并进行修改
+
 reflect.ValueOf.Elem => 获取指针指向的对象、获取 map 的 val，获取 interface 中的具体元素，
+
 // It panics if the type's Kind is not Array, Chan, Map, Ptr, or Slice.
 
 ## 基本类型
