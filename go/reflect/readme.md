@@ -1,6 +1,6 @@
 # reflect
 
-reflect.TypeOf => 具体类型
+reflect.TypeOf => 具体类型，例如 main.Person(struct)，map[string]int
 
 reflect.TypeOf.Kind => 总体类型，例如是 struct，还是 map，还是 int 什么的。
 
