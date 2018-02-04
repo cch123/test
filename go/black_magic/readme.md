@@ -16,3 +16,5 @@ touch a.s
 ```
 go build
 ```
+
+http://colobu.com/2017/05/12/call-private-functions-in-other-packages/
