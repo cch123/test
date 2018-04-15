@@ -33,7 +33,8 @@ start:
 	JMP  start
 
 done:
-	MOVQ SI, ret+16(FP)
+// 研究一下这里，为啥是 24(FP)
+	MOVQ SI, ret+24(FP)
 	RET
 
 // 汇编最后需要有一个空行

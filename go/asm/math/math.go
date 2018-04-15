@@ -16,8 +16,8 @@ func main() {
 	arr := []int64{1, 2, 3, 4, 10}
 	sux := sum(arr)
 	fmt.Println(sux)
-	fmt.Println(add(90, 101))
-	fmt.Println(minus(1021, 323))
+	fmt.Println(add(9, 10))
+	fmt.Println(minus(20, 9))
 	fmt.Println(sum1(arr))
 
 }
