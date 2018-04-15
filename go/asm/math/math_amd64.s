@@ -19,6 +19,7 @@ TEXT ·minus(SB),NOSPLIT, $0-24
 	RET
 
 // func sum(sl []int64) int64
+// 研究一下这里的 $0-32，如果 32 写少了的话，会不会被局部变量覆盖掉
 TEXT ·sum(SB),NOSPLIT, $0-32
 	MOVQ $0, SI
 	MOVQ sl+0(FP), BX // &sl[0], addr of the first elem
