@@ -12,13 +12,16 @@ GLOBL tx(SB), RODATA, $8
 // 就不是所谓的变量 size 了，官方这里严重误导
 
 // func output2() (int, float64)
-TEXT ·output2(SB),NOSPLIT,$0-16
-    MOVQ ox+0(SB), AX
-    // 注意，是没有办法直接从内存将数据搬到另一块内存的
-    // 如果要做这种内存搬运，必须把数据搬到 cpu，再从 cpu 写入到内存
-    MOVQ AX, ret+0(FP)
-    MOVQ px+0(SB), AX
-    MOVQ AX, ret+8(FP)
-    MOVQ two+0(SB), AX
-    MOVQ AX, ret+16(FP)
-    RET
+TEXT ·output2(SB), NOSPLIT, $0-16
+	MOVQ ox+0(SB), AX
+
+	// 注意，是没有办法直接从内存将数据搬到另一块内存的
+	// 如果要做这种内存搬运，必须把数据搬到 cpu，再从 cpu 写入到内存
+	MOVQ AX, ret+0(FP)
+	MOVQ px+0(SB), AX
+	MOVQ AX, ret+8(FP)
+
+	// MOVQ four<>+0(SB), AX  error relacation target not found
+	MOVQ two+0(SB), AX
+	MOVQ AX, ret+16(FP)
+	RET
