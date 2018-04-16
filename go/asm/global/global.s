@@ -6,6 +6,8 @@ DATA two+16(SB)/8, $22222
 GLOBL pi(SB), RODATA, $8
 GLOBL one(SB), RODATA, $16
 GLOBL two(SB), RODATA, $24
+DATA twoy+16(SB)/8, $99
+GLOBL twoy(SB), RODATA, $24
 
 // 注意这里最后的值，如果 rodata 里已经有其它变量了
 // 就不是所谓的变量 size 了，官方这里严重误导
@@ -16,8 +18,10 @@ TEXT ·output(SB),NOSPLIT,$0-16
     // 注意，是没有办法直接从内存将数据搬到另一块内存的
     // 如果要做这种内存搬运，必须把数据搬到 cpu，再从 cpu 写入到内存
     MOVQ AX, ret+0(FP)
+    // 这个 symbol 的名字 pi 需要和 GLOBL 的 symbol 一致
+    // 否则会提示 relocation xxx not found
     MOVQ pi+0(SB), AX
     MOVQ AX, ret+8(FP)
-    MOVQ two+16(SB), AX
+    MOVQ twoy+16(SB), AX
     MOVQ AX, ret+16(FP)
     RET
