@@ -13,6 +13,8 @@ GLOBL two(SB), RODATA, $24
 // func output() (int, float64)
 TEXT ·output(SB),NOSPLIT,$0-16
     MOVQ one+8(SB), AX
+    // 注意，是没有办法直接从内存将数据搬到另一块内存的
+    // 如果要做这种内存搬运，必须把数据搬到 cpu，再从 cpu 写入到内存
     MOVQ AX, ret+0(FP)
     MOVQ pi+0(SB), AX
     MOVQ AX, ret+8(FP)
