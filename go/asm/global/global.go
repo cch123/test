@@ -4,9 +4,9 @@ import (
 	"fmt"
 )
 
-func output() (int, float64)
+func output() (int, float64, int)
 
 func main() {
-	a, b := output()
-	fmt.Println(a, b)
+	a, b, c := output()
+	fmt.Println(a, b, c)
 }
