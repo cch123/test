@@ -31,5 +31,3 @@ MOVQ symname+8(SP), BX // pseudo SP
 ```
 
 The key is symname in asm code~
-
-Sometimes you may find the hardware SP point to the same location with your pseudo SP. *ONLY* where your frame size is 0, it is true.
