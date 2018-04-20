@@ -9,7 +9,7 @@ sym+0(FP)
 ------ FP
  return address 8 bytes
 ------
- frame pointer 8 bytes
+BP(frame pointer*) 8 bytes if your stack framesize == 0 or frame pointer is disabled, there will no BP save to this addr
 ------ SP
 sym-8(SP)
 -----
