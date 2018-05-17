@@ -1,0 +1,17 @@
+digraph finite_state_machine {
+    rankdir=LR;
+    size="8,5"
+
+    node [shape = doublecircle]; Gdead;
+    node [shape = point ]; qi
+
+    node [shape = circle];
+    Gidle-> Grunnable [ label = "test" ];
+    Grunnable  -> Grunning  [ label = "testtest" ];
+    Grunning -> Gsyscall  [ label = "a" ];
+    Gsyscal -> Gwaiting  [ label = "a" ];
+    Gdead -> Gcopystack [ label = "b" ];
+    Gscan -> Gscanrunnable [ label = "b" ];
+    Gscanrunning -> Gscansyscall [ label = "b" ];
+    Gscansyscall -> Gscanwaiting [ label = "b" ];
+}

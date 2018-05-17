@@ -1,0 +1,9 @@
+digraph finite_state_machine {
+    rankdir=LR;
+    size="8,5"
+
+
+    Pidle-> Prunning [ label = "test" ];
+    Psyscall -> Pgcstop [ label = "testtest" ];
+    Pgcstop-> Pdead [ label = "testtest" ];
+}
