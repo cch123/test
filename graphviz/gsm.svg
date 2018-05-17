@@ -3,15 +3,53 @@ digraph finite_state_machine {
     size="8,5"
 
     node [shape = doublecircle]; Gdead;
-    node [shape = point ]; qi
+    node [shape = point ]; start;
+    node [shape = circle] ;
 
-    node [shape = circle];
-    Gidle-> Grunnable [ label = "test" ];
-    Grunnable  -> Grunning  [ label = "testtest" ];
-    Grunning -> Gsyscall  [ label = "a" ];
-    Gsyscal -> Gwaiting  [ label = "a" ];
-    Gdead -> Gcopystack [ label = "b" ];
-    Gscan -> Gscanrunnable [ label = "b" ];
-    Gscanrunning -> Gscansyscall [ label = "b" ];
-    Gscansyscall -> Gscanwaiting [ label = "b" ];
+    // to idle
+    start -> Gidle [ label = "newg" ]
+
+    // to runnable
+    Gwaiting -> Grunnable [ label = "findRunnableGCWorker" ];
+    Gwaiting -> Grunnable [ label = "runtime.ready" ];
+    Gwaiting -> Grunnable [ label = "runtime.findrunnable" ];
+    Gwaiting -> Grunnable [ label = "runtime.injectglist" ];
+    Gwaiting -> Grunnable [ label = "runtime.schedule" ];
+    Gwaiting -> Grunnable [ label = "runtime.park_m" ];
+    Grunning -> Grunnable [ label = "runtime.goschedImpl" ];
+    Gsyscall -> Grunnable [ label = "runtime.exitsyscall0" ];
+    Gdead -> Grunnable [ label = "runtime.newproc1" ];
+    Gwaiting -> Grunnable [ label = "runtime.procresize" ];
+    Gwaiting -> Grunnable [ label = "runtime.checkdead" ];
+
+    // to running
+    Grunnable  -> Grunning  [ label = "runtime.execute" ];
+    Gwaiting -> Grunning [ label = "runtime.gcMarkTermination" ];
+    Gwaiting -> Grunning [ label = "runtime.gcBgMarkWorker" ];
+
+    Gwaiting -> Grunning [ label = "runtime.markroot" ];
+
+    Gwaiting -> Grunning [ label = "runtime.gcAssistAlloc1" ];
+    Gwaiting -> Grunning [ label = "runtime.newstack" ];
+    Gsyscall -> Grunning [ label = "runtime.exitsyscall" ];
+    Gcopystack -> Grunning [ label = "runtime.newstack" ];
+    Gscanrunning-> Grunning [ label = "runtime.scang" ];
+
+    // to waiting
+    Grunning -> Gwaiting [ label = "runtime.markroot" ];
+    Grunning -> Gwaiting [ label = "runtime.gcAssistAlloc1" ];
+    Grunning -> Gwaiting [ label = "runtime.park_m" ];
+    Grunning -> Gwaiting [ label = "runtime.gcMarkTermination" ];
+    Grunning -> Gwaiting [ label = "runtime.gcBgMarkWorker" ];
+    Grunning -> Gwaiting [ label = "runtime.newstack" ];
+
+    // to dead
+    Grunning -> Gdead [ label = "runtime.goexit0" ];
+
+    // to syscall
+    Grunning -> Gsyscall [ label = "runtime.reentersyscall" ];
+    Grunning -> Gsyscall [ label = "runtime.entersyscallblock" ];
+
+    // to copystack
+    Grunning -> Gcopystack [ label = "runtime.newstack" ];
 }
