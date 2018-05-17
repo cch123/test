@@ -45,15 +45,18 @@ digraph finite_state_machine {
 
     // to dead
     Grunning -> Gdead [ label = "runtime.goexit0" ];
+    Gidle -> Gdead [ label = "runtime.oneNewExtraM" ];
+    Gsyscall -> Gdead [ label = "runtime.dropm" ];
+    Gidle -> Gdead [ label = "runtime.newproc1" ];
 
     // to syscall
     Grunning -> Gsyscall [ label = "runtime.reentersyscall" ];
     Grunning -> Gsyscall [ label = "runtime.entersyscallblock" ];
     Gdead -> Gsyscall [ label = "runtime.needm" ];
 
-    // to dead
-    Gsyscall -> Gdead [ label = "runtime.dropm" ];
 
     // to copystack
     Grunning -> Gcopystack [ label = "runtime.newstack" ];
+    Gany -> Gcopystack [ label = "runtime.casgcopystack" ];
+
 }
