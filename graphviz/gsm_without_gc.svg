@@ -1,0 +1,53 @@
+digraph finite_state_machine {
+    rankdir=LR;
+    size="8,5"
+
+ //   node [shape = doublecircle]; Gdead;
+    node [shape = point ]; start;
+    node [shape = circle] ;
+
+    // to idle
+    start -> Gidle [ label = "newg" ]
+
+    // to runnable
+    Gwaiting -> Grunnable [ label = "ready" ];
+    Gwaiting -> Grunnable [ label = "findrunnable" ];
+    Gwaiting -> Grunnable [ label = "injectglist" ];
+    Gwaiting -> Grunnable [ label = "schedule" ];
+    Gwaiting -> Grunnable [ label = "park_m" ];
+    Grunning -> Grunnable [ label = "goschedImpl" ];
+    Gsyscall -> Grunnable [ label = "exitsyscall0" ];
+    Gdead -> Grunnable [ label = "newproc1" ];
+    Gwaiting -> Grunnable [ label = "procresize" ];
+    Gwaiting -> Grunnable [ label = "checkdead" ];
+
+    // to running
+    Grunnable  -> Grunning  [ label = "execute" ];
+
+    Gwaiting -> Grunning [ label = "markroot" ];
+
+    Gwaiting -> Grunning [ label = "newstack" ];
+    Gsyscall -> Grunning [ label = "exitsyscall" ];
+    Gcopystack -> Grunning [ label = "newstack" ];
+
+    // to waiting
+    Grunning -> Gwaiting [ label = "markroot" ];
+    Grunning -> Gwaiting [ label = "park_m" ];
+    Grunning -> Gwaiting [ label = "newstack" ];
+
+    // to dead
+    Grunning -> Gdead [ label = "goexit0" ];
+    Gidle -> Gdead [ label = "oneNewExtraM" ];
+    Gsyscall -> Gdead [ label = "dropm" ];
+    Gidle -> Gdead [ label = "newproc1" ];
+
+    // to syscall
+    Grunning -> Gsyscall [ label = "reentersyscall" ];
+    Grunning -> Gsyscall [ label = "entersyscallblock" ];
+    Gdead -> Gsyscall [ label = "needm" ];
+
+
+    // to copystack
+    Grunning -> Gcopystack [ label = "newstack" ];
+
+}

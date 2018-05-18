@@ -2,8 +2,27 @@ digraph finite_state_machine {
     rankdir=LR;
     size="8,5"
 
+    // to idle 
+    Pany -> Pidle [ label = "forEachP" ];
+    Pany -> Pidle [ label = "procresize" ];
+    Pany -> Pidle [ label = "releasep" ];
+    Pany -> Pidle [ label = "retake" ];
 
-    Pidle-> Prunning [ label = "test" ];
-    Psyscall -> Pgcstop [ label = "testtest" ];
-    Pgcstop-> Pdead [ label = "testtest" ];
+    // to running
+    Psyscall -> Prunning [ label = "exitsyscallfast" ];
+    Pany -> Prunning [ label = "procresize" ];
+    Pany -> Prunning [ label = "acquirep1" ];
+
+    // to syscall
+    Pany -> Psyscall [ label = "reentersyscall" ];
+
+    // to gcstop
+    Psyscall -> Pgcstop [ lable = "entersyscall_gcwait" ];
+    Pany -> Pgcstop [ lable = "stopTheWorldWithSema" ];
+    Pany -> Pgcstop [ lable = "handoffp" ];
+    Pany -> Pgcstop [ lable = "gcstopm" ];
+    Pany -> Pgcstop [ lable = "procresize" ];
+
+    Pany -> Pdead [ lable = "procresize" ];
+
 }
