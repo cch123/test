@@ -1,2 +1,2 @@
 
-Call other function in assembly.
+Call function in other packages by assembly.
