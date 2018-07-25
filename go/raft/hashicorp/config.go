@@ -26,23 +26,29 @@ func config(num int) {
 		transports = append(transports, transport)
 	}
 
-	// peerStore := &raft.StableStore
 	store := raft.NewInmemStore()
 	snaps := raft.NewInmemSnapshotStore()
 	var members raft.Configuration
 	for i := 0; i < num; i++ {
 		conf := raft.DefaultConfig()
 		conf.LocalID = raft.ServerID("test cluster" + fmt.Sprint(i))
-		addr, trans := raft.NewInmemTransport("")
+		addr, _ := raft.NewInmemTransport("")
 		members.Servers = append(members.Servers, raft.Server{
 			Suffrage: raft.Voter,
 			ID:       conf.LocalID,
 			Address:  addr,
 		})
+	}
+
+	for i := 0; i < num; i++ {
+		_, trans := raft.NewInmemTransport("")
+		conf := raft.DefaultConfig()
+		conf.LocalID = raft.ServerID("test cluster" + fmt.Sprint(i))
 		err := raft.BootstrapCluster(conf, store, store, snaps, trans, members)
 		if err != nil {
 			println(err)
 		}
+
 		raft, err := raft.NewRaft(conf, NewFSM(), store, store, snaps, trans)
 		if err != nil {
 			println(err)
