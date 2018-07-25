@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/hashicorp/raft"
 )
@@ -14,8 +15,6 @@ func init() {
 
 // create in-memory nodes and connect them
 func config(num int) {
-	conf := raft.DefaultConfig()
-	conf.LocalID = raft.ServerID("test cluster")
 	//snapshotStore := raft.DiscardSnapshotStore{}
 
 	addrs := []raft.ServerAddress{}
@@ -28,29 +27,44 @@ func config(num int) {
 	}
 
 	// peerStore := &raft.StableStore
-	memStore := raft.NewInmemStore()
-	memSnapStore := raft.NewInmemSnapshotStore()
-
+	store := raft.NewInmemStore()
+	snaps := raft.NewInmemSnapshotStore()
+	var members raft.Configuration
 	for i := 0; i < num; i++ {
-		// connect to each other
-		for j := 0; j < num; j++ {
-			if i != j {
-				transports[i].Connect(addrs[j], transports[j])
-			}
-		}
-
-		r, err := raft.NewRaft(conf, NewFSM(),
-			memStore, memStore, memSnapStore, transports[i])
-
+		conf := raft.DefaultConfig()
+		conf.LocalID = raft.ServerID("test cluster" + fmt.Sprint(i))
+		addr, trans := raft.NewInmemTransport("")
+		members.Servers = append(members.Servers, raft.Server{
+			Suffrage: raft.Voter,
+			ID:       conf.LocalID,
+			Address:  addr,
+		})
+		err := raft.BootstrapCluster(conf, store, store, snaps, trans, members)
 		if err != nil {
-			fmt.Println(err)
-			panic(1)
+			println(err)
+		}
+		raft, err := raft.NewRaft(conf, NewFSM(), store, store, snaps, trans)
+		if err != nil {
+			println(err)
 		}
 
-		for i := 0; i < num; i++ {
-			r.AddPeer(addrs[i])
-		}
+		timeout := time.After(10 * time.Second)
+		go func() {
+			for {
+				if raft.Leader() != "" {
+					break
+				}
 
-		rafts[string(addrs[i])] = r
+				select {
+				case <-raft.LeaderCh():
+				case <-time.After(1 * time.Second):
+					// Need to poll because we might have missed the first
+					// go with the leader channel.
+				case <-timeout:
+					println("ffdfds")
+				}
+			}
+		}()
 	}
+
 }
