@@ -15,6 +15,7 @@ func init() {
 // create in-memory nodes and connect them
 func config(num int) {
 	conf := raft.DefaultConfig()
+	conf.LocalID = raft.ServerID("test cluster")
 	//snapshotStore := raft.DiscardSnapshotStore{}
 
 	addrs := []raft.ServerAddress{}
