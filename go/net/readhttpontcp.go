@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io/ioutil"
 	"net"
 	"net/http"
 )
@@ -43,14 +44,22 @@ func main() {
 		defer conn.Close()
 
 		go func() {
-			r, err := http.ReadRequest(bufio.NewReader(conn))
-			if err != nil {
-				fmt.Println("fuck", err)
-				return
+			for {
+				r, err := http.ReadRequest(bufio.NewReader(conn))
+				if err != nil {
+					fmt.Println("fuck", err)
+					return
+				}
+				if r.Body != nil {
+					defer r.Body.Close()
+				}
+
+				fmt.Printf("%#v\n", r)
+				conn.Write([]byte(respContent))
+				fmt.Println(r.ContentLength)
+				buf, err := ioutil.ReadAll(r.Body)
+				fmt.Println(string(buf), err)
 			}
-			fmt.Printf("%#v\n", r)
-			conn.Write([]byte(respContent))
-			fmt.Println(r.ContentLength)
 		}()
 	}
 }
