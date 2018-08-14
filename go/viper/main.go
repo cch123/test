@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/lunny/log"
@@ -16,17 +17,27 @@ func main() {
 	// alternatively, you can create a new viper instance.
 	var runtime_viper = viper.New()
 
-	runtime_viper.AddRemoteProvider("etcd", "http://127.0.0.1:4001", "/config/hugo.yml")
-	runtime_viper.SetConfigType("yaml") // because there is no file extension in a stream of bytes, supported extensions are "json", "toml", "yaml", "yml", "properties", "props", "prop"
-
-	// read from remote config the first time.
-	err := runtime_viper.ReadRemoteConfig()
+	err := runtime_viper.AddRemoteProvider("etcd", "http://127.0.0.1:2379", "/config/hugo.yml")
 	if err != nil {
 		panic(err)
 	}
+	println("step 1")
+	runtime_viper.SetConfigType("json") // because there is no file extension in a stream of bytes, supported extensions are "json", "toml", "yaml", "yml", "properties", "props", "prop"
+
+	// read from remote config the first time.
+	err = runtime_viper.ReadRemoteConfig()
+	if err != nil {
+		panic(err)
+	}
+	println("step 2")
 
 	// unmarshal config
-	runtime_viper.Unmarshal(&runtime_conf)
+	err = runtime_viper.Unmarshal(&runtime_conf)
+	if err != nil {
+		panic(err)
+	}
+	println("step 3")
+	fmt.Println(runtime_conf)
 
 	// open a goroutine to watch remote changes forever
 	go func() {
