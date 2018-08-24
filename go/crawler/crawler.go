@@ -13,11 +13,11 @@ var visited = map[string]bool{}
 func main() {
 	// Instantiate default collector
 	c := colly.NewCollector(
-		// Visit only domains: hackerspaces.org, wiki.hackerspaces.org
 		colly.AllowedDomains("www.v2ex.com"),
+		colly.MaxDepth(1),
 	)
 
-	detailRegex, _ := regexp.Compile(`/go/go?p=\d+$`)
+	detailRegex, _ := regexp.Compile(`/go/go\?p=\d+$`)
 	listRegex, _ := regexp.Compile(`/t/\d+#\w+`)
 	//panRegex, _ := regexp.Compile(`pan.baidu.com`)
 
@@ -34,7 +34,6 @@ func main() {
 
 	// On every a element which has href attribute call callback
 	c.OnHTML("a[href]", func(e *colly.HTMLElement) {
-		time.Sleep(time.Second)
 		link := e.Attr("href")
 
 		// 已访问过的详情页或列表页，跳过
@@ -49,6 +48,7 @@ func main() {
 			println("not match", link)
 			return
 		}
+		time.Sleep(time.Second)
 		println("match", link)
 
 		visited[link] = true
