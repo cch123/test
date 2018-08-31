@@ -9,6 +9,7 @@ import (
 var domain2Collector = map[string]*colly.Collector{}
 
 func factory(domain string) *colly.Collector {
+	//u, _ := url.Parse(domain)
 	return domain2Collector[domain]
 }
 
