@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	nats "github.com/nats-io/go-nats"
 )
@@ -13,16 +14,20 @@ func main() {
 		return
 	}
 
-	var ch = make(chan *nats.Msg, 10)
-	sub, err := nc.QueueSubscribeSyncWithChan("tasks", "workers", ch)
+	sub, err := nc.QueueSubscribeSync("tasks", "workers")
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	for msg := range ch {
+	var msg *nats.Msg
+	for {
+		msg, err = sub.NextMsg(time.Hour * 10000)
+		if err != nil {
+			break
+		}
 		fmt.Println(string(msg.Data), msg.Reply, msg.Sub, msg.Subject, err)
 	}
+	nc.Flush()
 	sub.Unsubscribe()
-
 }
