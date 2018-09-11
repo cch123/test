@@ -29,7 +29,6 @@ func readConfig() (bool, bool, bool) {
 		_, ok1 := option.c1.fk2Opts["1"]
 		_, ok2 := option.c1.topic2Opts["x"]
 		_, ok3 := option.c1.ev2Opts["1"]
-		println(ok1, ok2, ok3)
 		return ok1, ok2, ok3
 	}
 
@@ -38,7 +37,6 @@ func readConfig() (bool, bool, bool) {
 	_, ok1 := option.c2.fk2Opts["1"]
 	_, ok2 := option.c2.topic2Opts["1"]
 	_, ok3 := option.c2.ev2Opts["x"]
-	println(ok1, ok2, ok3)
 	return ok1, ok2, ok3
 }
 
@@ -46,7 +44,7 @@ func writeToConfig() {
 	fk2Opts := map[string]string{}
 	topic2Opts := map[string]string{}
 	ev2Opts := map[string]string{}
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 10000; i++ {
 		fk2Opts[fmt.Sprint(i)] = fmt.Sprint(i)
 		topic2Opts[fmt.Sprint(i)] = fmt.Sprint(i)
 		ev2Opts[fmt.Sprint(i)] = fmt.Sprint(i)
