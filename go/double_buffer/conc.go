@@ -50,7 +50,8 @@ func writeToConfig() {
 		ev2Opts[fmt.Sprint(i)] = fmt.Sprint(i)
 	}
 	idx := atomic.LoadInt64(&option.currentIdx)
-	if idx == 0 {
+	newVal := 1 - idx
+	if newVal == 0 {
 		option.c1.l.Lock()
 		defer option.c1.l.Unlock()
 		option.c1.fk2Opts = fk2Opts
