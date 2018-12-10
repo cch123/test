@@ -1,0 +1,5 @@
+package main
+
+import _ "runtime"
+
+func main()
