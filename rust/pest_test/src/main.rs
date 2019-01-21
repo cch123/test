@@ -1,33 +1,75 @@
 extern crate pest;
-#[macro_use]
-extern crate pest_derive;
 
-use pest::Parser;
+use std::io::{self, Write};
 
-#[derive(Parser)]
-#[grammar = "ident.pest"]
-struct IdentParser;
+use pest::error::Error;
+use pest::iterators::Pairs;
+use pest::{state, ParseResult, Parser, ParserState};
+
+#[allow(dead_code, non_camel_case_types)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+enum Rule {
+    expr,
+    paren,
+    paren_end,
+}
+
+struct ParenParser;
+
+impl Parser<Rule> for ParenParser {
+    fn parse(rule: Rule, input: &str) -> Result<Pairs<Rule>, Error<Rule>> {
+        fn expr(state: Box<ParserState<Rule>>) -> ParseResult<Box<ParserState<Rule>>> {
+            state.sequence(|s| s.repeat(|s| paren(s)).and_then(|s| s.end_of_input()))
+        }
+
+        fn paren(state: Box<ParserState<Rule>>) -> ParseResult<Box<ParserState<Rule>>> {
+            state.rule(Rule::paren, |s| {
+                s.sequence(|s| {
+                    s.match_string("(")
+                        .and_then(|s| {
+                            s.optional(|s| {
+                                s.sequence(|s| {
+                                    s.lookahead(true, |s| s.match_string("("))
+                                        .and_then(|s| s.repeat(|s| paren(s)))
+                                })
+                            })
+                        })
+                        .and_then(|s| s.rule(Rule::paren_end, |s| s.match_string(")")))
+                })
+            })
+        }
+
+        state(input, |state| match rule {
+            Rule::expr => expr(state),
+            Rule::paren => paren(state),
+            _ => unreachable!(),
+        })
+    }
+}
+
+#[derive(Debug)]
+struct Paren(Vec<Paren>);
+
+fn expr(pairs: Pairs<Rule>) -> Vec<Paren> {
+    pairs
+        .filter(|p| p.as_rule() == Rule::paren)
+        .map(|p| Paren(expr(p.into_inner())))
+        .collect()
+}
 
 fn main() {
-    let pairs = IdentParser::parse(Rule::ident_list, "a1 b2").unwrap_or_else(|e| panic!("{}", e));
+    loop {
+        let mut line = String::new();
 
-    // Because ident_list is silent, the iterator will contain idents
-    for pair in pairs {
+        print!("> ");
+        io::stdout().flush().unwrap();
 
-        let span = pair.clone().into_span();
-        // A pair is a combination of the rule which matched and a span of input
-        println!("Rule:    {:?}", pair.as_rule());
-        println!("Span:    {:?}", span);
-        println!("Text:    {}", span.as_str());
+        io::stdin().read_line(&mut line).unwrap();
+        line.pop();
 
-        // A pair can be converted to an iterator of the tokens which make it up:
-        for inner_pair in pair.into_inner() {
-            let inner_span = inner_pair.clone().into_span();
-            match inner_pair.as_rule() {
-                Rule::alpha => println!("Letter:  {}", inner_span.as_str()),
-                Rule::digit => println!("Digit:   {}", inner_span.as_str()),
-                _ => unreachable!()
-            };
-        }
+        match ParenParser::parse(Rule::expr, &line) {
+            Ok(pairs) => println!("{:?}", expr(pairs)),
+            Err(e) => println!("\n{}", e),
+        };
     }
 }
