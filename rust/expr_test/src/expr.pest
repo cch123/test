@@ -15,26 +15,30 @@ expr = {
 }
 
 and_expr = {
-    paren_bool ~ and_op ~ expr
-    | comp_expr ~ and_op ~ expr
+    paren_bool ~ "and" ~ expr
+    | comp_expr ~ "and" ~ expr
 }
 
 or_expr = {
-    paren_bool ~ or_op ~ expr
-    | comp_expr ~ or_op ~ expr
+    paren_bool ~ "or" ~ expr
+    | comp_expr ~ "or" ~ expr
 }
 
-paren_bool = { lparen ~ expr ~ rparen }
-
-and_op = {"and"}
-or_op = {"or"}
-lparen = {"("}
-rparen = {")"}
+paren_bool = { "(" ~ expr ~  ")" }
 
 comp_expr = { field ~ op ~ value }
 
-field = { ASCII_ALPHANUMERIC+ }
-op = { "=" | "in" | "!=" | "not in" | ">" | "<" | ">="| "<=" | "is"}
+field = @{ (ASCII_ALPHA ~ ASCII_ALPHANUMERIC*) }
+op = { op_eq | op_neq | op_in | op_gt | op_gte | op_lt | op_lte | op_is }
+op_eq = { "=" }
+op_neq = { "!="|"<>" }
+op_in = { "in"|"not in" }
+op_gt = { ">" }
+op_gte = { ">=" }
+op_lt = { "<" }
+op_lte = { "<=" }
+op_is = { "is"|"is not" }
+
 value = { string_literal | num_literal }
 
 num_literal = @{

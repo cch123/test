@@ -17,7 +17,6 @@ use pest::Parser;
 pub struct ExprParser;
 
 fn main() {
-    /*
     let expr = ExprParser::parse(Rule::expr, r#"a = "2121""#).expect("parse failed").next().unwrap();
     dbg!(expr);
     let expr = ExprParser::parse(Rule::expr, r#"a = 1 and b = 2"#).expect("parse failed").next().unwrap();
@@ -26,8 +25,9 @@ fn main() {
     dbg!(expr);
     let expr = ExprParser::parse(Rule::expr, "a=1 and b=2").expect("parse failed").next().unwrap();
     dbg!(expr);
-    */
     let expr = ExprParser::parse(Rule::expr, "a=1 and ((b = 2) and c=1)").expect("parse failed").next().unwrap();
+    dbg!(expr);
+    let expr = ExprParser::parse(Rule::expr, "a in 1").expect("parse failed").next().unwrap();
     dbg!(expr);
 }
 
