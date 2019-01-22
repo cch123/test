@@ -1,5 +1,30 @@
-expr = {binary_op ~ ("and"|"or" ~ binary_op)*}
-binary_op = { field ~ op ~ value}
+/*
+pest 不支持左递归
+expr = {
+    (expr ~ and_op ~ expr)
+    | (expr ~ or_op ~ expr)
+    | ("(" ~ expr ~ ")")
+    | comp_expr
+}*/
+
+expr = {
+    comp_expr ~ expr_tail
+    | lparen ~ expr ~ rparen ~ expr_tail
+}
+
+expr_tail = {
+    and_op ~ expr
+    | or_op ~ expr
+    | "" /*消除左递归之后，expr_tail 需要有空值*/
+}
+
+and_op = {"and"}
+or_op = {"or"}
+lparen = {"("}
+rparen = {")"}
+
+comp_expr = { field ~ op ~ value }
+
 field = { ASCII_ALPHANUMERIC+ }
 op = { "=" | "in" | "!=" | "not in" | ">" | "<" | ">="| "<=" | "is"}
 value = { string_literal | num_literal }
@@ -20,3 +45,32 @@ char = {
 }
 
 WHITESPACE = _{ " " | "\n" | "\r" }
+
+/*
+消除左递归的一个例子
+但是这样 ast 会变得很丑
+<expr> ::= <expr> + <term>
+         | <expr> - <term>
+         | <term>
+
+<term> ::= <term> * <factor>
+         | <term> / <factor>
+         | <factor>
+
+<factor> ::= ( <expr> )
+         | Num
+
+
+<expr> ::= <term> <expr_tail>
+<expr_tail> ::= + <term> <expr_tail>
+              | - <term> <expr_tail>
+              | <empty>
+
+<term> ::= <factor> <term_tail>
+<term_tail> ::= * <factor> <term_tail>
+              | / <factor> <term_tail>
+              | <empty>
+
+<factor> ::= ( <expr> )
+           | Num
+*/
