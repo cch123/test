@@ -25,6 +25,8 @@ fn main() {
     dbg!(expr);
     let expr = ExprParser::parse(Rule::expr, "a=1 and b=2").expect("parse failed").next().unwrap();
     dbg!(expr);
+    let expr = ExprParser::parse(Rule::expr, "a=1 and ((b = 2) and c=1)").expect("parse failed").next().unwrap();
+    dbg!(expr);
 }
 
 /*

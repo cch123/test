@@ -9,8 +9,10 @@ expr = {
 
 expr = {
     comp_expr ~ expr_tail
-    | lparen ~ expr ~ rparen ~ expr_tail
+    | paren_bool ~ expr_tail
 }
+
+paren_bool = { lparen ~ expr ~ rparen }
 
 expr_tail = {
     and_op ~ expr
