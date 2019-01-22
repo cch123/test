@@ -8,17 +8,23 @@ expr = {
 }*/
 
 expr = {
-    comp_expr ~ expr_tail
-    | paren_bool ~ expr_tail
+    and_expr
+    | or_expr
+    | paren_bool
+    | comp_expr
+}
+
+and_expr = {
+    paren_bool ~ and_op ~ expr
+    | comp_expr ~ and_op ~ expr
+}
+
+or_expr = {
+    paren_bool ~ or_op ~ expr
+    | comp_expr ~ or_op ~ expr
 }
 
 paren_bool = { lparen ~ expr ~ rparen }
-
-expr_tail = {
-    and_op ~ expr
-    | or_op ~ expr
-    | "" /*消除左递归之后，expr_tail 需要有空值*/
-}
 
 and_op = {"and"}
 or_op = {"or"}
