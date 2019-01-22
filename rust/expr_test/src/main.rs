@@ -9,7 +9,7 @@ use pest::Parser;
 pub struct ExprParser;
 
 fn main() {
-    let expr = ExprParser::parse(Rule::expr, "a = \"1\"").expect("parse failed").next().unwrap();
+    let expr = ExprParser::parse(Rule::expr, r#"a = "2121""#).expect("parse failed").next().unwrap();
     dbg!(expr);
 }
 
