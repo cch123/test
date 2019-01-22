@@ -1,3 +1,11 @@
+/*
+基本的语法设计，可以参考：
+
+https://github.com/sejr/iron/blob/master/grammar/iron.pest
+
+如果是写 bool expr 的解析的话，这里面的范例应该是已经够了
+*/
+
 extern crate pest;
 #[macro_use]
 extern crate pest_derive;
