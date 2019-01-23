@@ -11,12 +11,14 @@ extern crate pest;
 extern crate pest_derive;
 
 use pest::Parser;
+use pest::error::Error;
 
 #[derive(Parser)]
 #[grammar = "expr.pest"]
 pub struct ExprParser;
 
 fn main() {
+    /*
     let expr = ExprParser::parse(Rule::expr, r#"a = "2121""#).expect("parse failed").next().unwrap();
     dbg!(expr);
     let expr = ExprParser::parse(Rule::expr, r#"a = 1 and b = 2"#).expect("parse failed").next().unwrap();
@@ -29,75 +31,36 @@ fn main() {
     dbg!(expr);
     let expr = ExprParser::parse(Rule::expr, "a in 1").expect("parse failed").next().unwrap();
     dbg!(expr);
+    */
+    let expr = ExprParser::parse(Rule::expr, "(a=1 and ((b = 2) and c=1))").expect("parse failed").next().unwrap();
+    //dbg!(&expr);
+    parse_expr(expr).unwrap();
 }
 
-/*
-[src/main.rs:13] expr = Pair {
-    rule: expr,
-    span: Span {
-        str: "a = \"1\"",
-        start: 0,
-        end: 7
-    },
-    inner: [
-        Pair {
-            rule: binary_op,
-            span: Span {
-                str: "a = \"1\"",
-                start: 0,
-                end: 7
+use pest::iterators::Pair;
+fn parse_expr(expr : Pair<Rule>) -> Result<(), Error<Rule>> {
+    for record in expr.into_inner() {
+        match record.as_rule() {
+            Rule::expr => {
+                record.into_inner().for_each(|r|{
+                    parse_expr(r);
+                });
             },
-            inner: [
-                Pair {
-                    rule: field,
-                    span: Span {
-                        str: "a ",
-                        start: 0,
-                        end: 2
-                    },
-                    inner: []
-                },
-                Pair {
-                    rule: op,
-                    span: Span {
-                        str: "=",
-                        start: 2,
-                        end: 3
-                    },
-                    inner: []
-                },
-                Pair {
-                    rule: value,
-                    span: Span {
-                        str: "\"1\"",
-                        start: 4,
-                        end: 7
-                    },
-                    inner: [
-                        Pair {
-                            rule: string_literal,
-                            span: Span {
-                                str: "\"1\"",
-                                start: 4,
-                                end: 7
-                            },
-                            inner: [
-                                Pair {
-                                    rule: string,
-                                    span: Span {
-                                        str: "1",
-                                        start: 5,
-                                        end: 6
-                                    },
-                                    inner: []
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
+            Rule::or_expr => {
+                dbg!(record);
+            },
+            Rule::and_expr => {
+                dbg!(record);
+            },
+            Rule::paren_bool => {
+                record.into_inner().for_each(|r|{
+                    dbg!(r);
+                });
+            }
+            Rule::comp_expr => {
+            }
+            _ => unreachable!()
         }
-    ]
+    }
+    Ok(())
 }
-
-*/
