@@ -15,13 +15,11 @@ expr = {
 }
 
 and_expr = {
-    paren_bool ~ "and" ~ expr
-    | comp_expr ~ "and" ~ expr
+    (paren_bool | comp_expr) ~ "and" ~ (and_expr | or_expr | paren_bool | comp_expr)
 }
 
 or_expr = {
-    paren_bool ~ "or" ~ expr
-    | comp_expr ~ "or" ~ expr
+    (paren_bool | comp_expr)  ~ "or" ~ (and_expr | or_expr | paren_bool | comp_expr)
 }
 
 paren_bool = { "(" ~ expr ~  ")" }
@@ -29,15 +27,7 @@ paren_bool = { "(" ~ expr ~  ")" }
 comp_expr = { field ~ op ~ value }
 
 field = @{ (ASCII_ALPHA ~ ASCII_ALPHANUMERIC*) }
-op = { op_eq | op_neq | op_in | op_gt | op_gte | op_lt | op_lte | op_is }
-op_eq = { "=" }
-op_neq = { "!="|"<>" }
-op_in = { "in"|"not in" }
-op_gt = { ">" }
-op_gte = { ">=" }
-op_lt = { "<" }
-op_lte = { "<=" }
-op_is = { "is"|"is not" }
+op = { "="| "!="| "<>"| "in" | "not in" | ">" | ">=" | "<" | "<=" | "is" | "is not" }
 
 value = { string_literal | num_literal }
 
