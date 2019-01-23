@@ -66,24 +66,21 @@ fn parse_expr(expr: Pair<Rule>) -> Result<Node, Error<Rule>> {
                 record.into_inner().for_each(|r| {
                     parse_expr(r).unwrap();
                 });
-            }
+            },
             Rule::or_expr => {}
             Rule::and_expr => {
                 let mut iter = record.into_inner();
-                let left = iter.next().unwrap(); //.into_inner().next().unwrap();
+                let left = iter.next().unwrap();
                 let right = iter.next().unwrap();
-                println!("{:?}", left);
-                println!("{:?}", right);
+                let left_tree = parse_expr(left).unwrap();
+                let right_tree= parse_expr(right).unwrap();
                 return Ok(Node::AndExpr {
-                    left : Box::new(Node::Null),
-                    right: Box::new(Node::Null),
+                    left : Box::new(left_tree),
+                    right: Box::new(right_tree),
                 });
             },
             Rule::paren_bool => {
-                record.into_inner().for_each(|r| {
-                    println!("{:?}, {:?}", r.as_str(), r.as_rule());
-                    parse_expr(r).unwrap();
-                });
+                return parse_expr(record.into_inner().next().unwrap());
             }
             Rule::comp_expr => {
                 return Ok(Node::CompExpr {
