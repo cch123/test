@@ -55,8 +55,7 @@ enum Node {
         lhs: String,
         op: String,
         rhs: String,
-    },
-    Null,
+    }
 }
 
 fn parse_expr(expr: Pair<Rule>) -> Result<Node, Error<Rule>> {
@@ -67,7 +66,17 @@ fn parse_expr(expr: Pair<Rule>) -> Result<Node, Error<Rule>> {
                     parse_expr(r).unwrap();
                 });
             },
-            Rule::or_expr => {}
+            Rule::or_expr => {
+                let mut iter = record.into_inner();
+                let left = iter.next().unwrap();
+                let right = iter.next().unwrap();
+                let left_tree = parse_expr(left).unwrap();
+                let right_tree= parse_expr(right).unwrap();
+                return Ok(Node::OrExpr{
+                    left : Box::new(left_tree),
+                    right: Box::new(right_tree),
+                });
+            }
             Rule::and_expr => {
                 let mut iter = record.into_inner();
                 let left = iter.next().unwrap();
@@ -83,16 +92,26 @@ fn parse_expr(expr: Pair<Rule>) -> Result<Node, Error<Rule>> {
                 return parse_expr(record.into_inner().next().unwrap());
             }
             Rule::comp_expr => {
+                let mut field = "".to_string();
+                let mut op="".to_string() ;
+                let mut value = "".to_string() ;
+                record.into_inner().for_each(|r| {
+                    match r.as_rule() {
+                        Rule::field => field = r.as_str().to_string(),
+                        Rule::op => op = r.as_str().to_string(),
+                        Rule::value=> value = r.as_str().to_string(),
+                        _ => unreachable!()
+                    }
+                });
+
                 return Ok(Node::CompExpr {
-                    lhs: "abc".to_string(),
-                    op: "=".to_string(),
-                    rhs: "aaa".to_string(),
+                    lhs: field,
+                    op,
+                    rhs: value,
                 })
             },
-            _ => {
-                println!("fff{:?}", record);
-            }
+            _ => unreachable!()
         }
     }
-    Ok(Node::Null)
+    unreachable!()
 }
