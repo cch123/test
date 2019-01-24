@@ -103,11 +103,10 @@ fn parse_expr(record: Pair<Rule>) -> Result<Node, Error<Rule>> {
                 parse_expr(iter.next().unwrap()).unwrap(),
                 parse_expr(iter.next().unwrap()).unwrap(),
             );
-            let res = Node::AndExpr {
+            return Ok(Node::AndExpr {
                 left: Box::new(left_tree),
                 right: Box::new(right_tree),
-            };
-            return Ok(res);
+            });
         }
         Rule::paren_bool => {
             return parse_expr(record.into_inner().next().unwrap());
