@@ -84,7 +84,7 @@ enum Node {
 
 fn parse_expr(record: Pair<Rule>) -> Result<Node, Error<Rule>> {
     match record.clone().as_rule() {
-        Rule::expr => {
+        Rule::bool_expr | Rule::expr | Rule::paren_bool => {
             return parse_expr(record.into_inner().next().unwrap());
         }
         Rule::or_expr => {
@@ -108,9 +108,6 @@ fn parse_expr(record: Pair<Rule>) -> Result<Node, Error<Rule>> {
                 left: Box::new(left_tree),
                 right: Box::new(right_tree),
             });
-        }
-        Rule::paren_bool => {
-            return parse_expr(record.into_inner().next().unwrap());
         }
         Rule::comp_expr => {
             let mut iter = record.into_inner();
