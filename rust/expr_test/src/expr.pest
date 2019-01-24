@@ -7,6 +7,8 @@ expr = {
     | comp_expr
 }*/
 
+bool_expr = { SOI ~ expr ~ EOI }
+
 expr = {
     and_expr
     | or_expr
