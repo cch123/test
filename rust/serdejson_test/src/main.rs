@@ -12,5 +12,10 @@ fn main() {
         s.clone() : format!("{}", "fuck")
     });
     println!("{}", a);
+    let b = json!({
+        "x" : a,
+        "y" : 1
+    });
+    println!("{}", b);
 }
 

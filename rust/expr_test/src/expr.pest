@@ -7,6 +7,8 @@ expr = {
     | comp_expr
 }*/
 
+bool_expr = { SOI ~ expr ~ EOI }
+
 expr = {
     and_expr
     | or_expr
@@ -15,14 +17,14 @@ expr = {
 }
 
 and_expr = {
-    (paren_bool | comp_expr) ~ "and" ~ (and_expr | or_expr | paren_bool | comp_expr)
+    (paren_bool | comp_expr) ~ "and" ~ (expr)
 }
 
 or_expr = {
-    (paren_bool | comp_expr)  ~ "or" ~ (and_expr | or_expr | paren_bool | comp_expr)
+    (paren_bool | comp_expr)  ~ "or" ~ (expr)
 }
 
-paren_bool = { "(" ~ (and_expr | or_expr | paren_bool | comp_expr) ~  ")" }
+paren_bool = { "(" ~ (expr) ~  ")" }
 
 comp_expr = { field ~ op ~ value }
 
