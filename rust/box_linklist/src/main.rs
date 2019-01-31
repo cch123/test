@@ -14,6 +14,11 @@ impl Node {
 }
 
 fn main() {
+    f1();
+    f2();
+}
+
+fn f1() {
     let nums = vec![1,2,3,4];
     let mut dummy = Box::new(Node::new(0));
     let mut cur = &mut dummy;
@@ -46,5 +51,17 @@ error[E0716]: temporary value dropped while borrowed
         */
     }
     println!("{:?}", dummy);
-    println!("{:?}", dummy.next);
+}
+
+fn f2() {
+    let nums = vec![1,2,3,4];
+    let mut dummy = Some(Box::new(Node::new(0)));
+    let mut cur = &mut dummy;
+    for n in nums {
+        cur.as_mut().unwrap().next = Some(Box::new(Node::new(n)));
+        // 下面这样的写法是不行的，因为要改变 option<T> 中的 T，所以必须让 T 是 mut 才行
+        // cur.unwrap().next = Some(Box::new(Node::new(n)));
+        cur = &mut cur.as_mut().unwrap().next;
+    }
+    println!("{:?}", dummy.unwrap());
 }
