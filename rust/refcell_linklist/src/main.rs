@@ -17,6 +17,7 @@ fn main() {
     f1();
     f2();
     f3();
+    f4();
 }
 
 fn f1() {
@@ -77,6 +78,27 @@ fn f3() {
         cursor.borrow_mut().next = Some(node);
         let next= cursor.borrow_mut().next.clone();
         cursor = next.unwrap();
+    }
+    println!("{:?}", dummy);
+}
+
+fn f4() {
+    let dummy = Rc::new(RefCell::new(TreeNode::new(0)));
+    let mut cursor = Rc::clone(&dummy);
+    let nums = vec![1, 2, 3, 4];
+    for n in nums {
+        let node = Rc::new(RefCell::new(TreeNode::new(n)));
+        cursor.borrow_mut().next = Some(node);
+        // 和 f3 一样，这里如果不 clone，会报 cannot move out of borrowed content
+        let next= cursor.borrow_mut().next.clone().unwrap();
+        /*
+        error[E0507]: cannot move out of borrowed content
+  --> src/main.rs:92:19
+   |
+92 |         let next= cursor.borrow_mut().next.unwrap();
+   |                   ^^^^^^^^^^^^^^^^^^^^^^^^ cannot move out of borrowed content
+        */
+        cursor = next;
     }
     println!("{:?}", dummy);
 }
