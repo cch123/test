@@ -16,6 +16,7 @@ impl TreeNode {
 fn main() {
     f1();
     f2();
+    f3();
 }
 
 fn f1() {
@@ -63,6 +64,19 @@ fn f2() {
             unreachable!()
         }
         cursor = next;
+    }
+    println!("{:?}", dummy);
+}
+
+fn f3() {
+    let dummy = Rc::new(RefCell::new(TreeNode::new(0)));
+    let mut cursor = Rc::clone(&dummy);
+    let nums = vec![1, 2, 3, 4];
+    for n in nums {
+        let node = Rc::new(RefCell::new(TreeNode::new(n)));
+        cursor.borrow_mut().next = Some(node);
+        let next= cursor.borrow_mut().next.clone();
+        cursor = next.unwrap();
     }
     println!("{:?}", dummy);
 }
