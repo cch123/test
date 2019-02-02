@@ -1,0 +1,14 @@
+expression = { primary ~ (infix ~ primary)* }
+primary    = { "(" ~ expression ~ ")" | number }
+number     = @{ "-"? ~ ("0" | ('1'..'9' ~ '0'..'9'*)) }
+
+// infix operators
+plus = { "+" }
+minus = { "-" }
+times = { "*" }
+divide = { "/" }
+modulus = { "%" }
+power = { "^" }
+infix = _{ plus | minus | times | divide | modulus | power }
+
+whitespace = _{ " " | "\r" | "\n" | "\t" }

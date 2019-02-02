@@ -1,0 +1,11 @@
+[package]
+name = "prec_climber_test"
+version = "0.1.0"
+authors = ["xargin <cao1988228@163.com>"]
+edition = "2018"
+
+[dependencies]
+pest = "2.0"
+pest_derive = "2.0"
+serde_json = "1.0.37"
+rustyline = "1"
