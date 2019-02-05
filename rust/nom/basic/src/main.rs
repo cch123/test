@@ -1,37 +1,67 @@
-//#[macro_use]
-//extern crate nom;
-use nom::{do_parse, map_res, named, tag, take_while_m_n};
+#[macro_use]
+extern crate nom;
+use nom::{do_parse, map_res, named, tag, take_while, tag_no_case, multispace};
 
 #[derive(Debug, PartialEq)]
-pub struct Color {
-    pub red: u8,
-    pub green: u8,
-    pub blue: u8,
+pub struct BinOp <'a>{
+    pub lhs: &'a str,
+    pub op: &'a str,
+    pub rhs: &'a str,
 }
 
-fn from_hex(input: &str) -> Result<u8, std::num::ParseIntError> {
-    u8::from_str_radix(input, 16)
+fn is_ident(c: char) -> bool {
+    c.is_ascii_alphanumeric()
 }
 
-fn is_hex_digit(c: char) -> bool {
-    c.is_digit(16)
-}
-
-named!(hex_primary<&str, u8>,
-  map_res!(take_while_m_n!(2, 2, is_hex_digit), from_hex)
+named!(ident<&str, &str>,
+  take_while!(is_ident)
 );
 
-named!(hex_color<&str, Color>,
+fn is_op(c:char) -> bool {
+    match c {
+        '=' | '>' | '<'  => true,
+        _ => false
+    }
+}
+
+named!(operator<&str, &str>,
+  take_while!(is_op)
+);
+
+fn is_space(c:char) -> bool {
+    if c == ' ' {
+        return true
+    }
+    false
+}
+named!(eat_space<&str, &str>,
+  take_while!(is_space)
+);
+
+named!(pub opt_multispace<&str, Option<&str>>,
+       opt!(complete!(multispace))
+);
+fn is_digit(c:char) -> bool {
+    c.is_ascii_digit()
+}
+
+named!(number<&str, &str>,
+  take_while1!(is_digit)
+);
+
+named!(hex_color<&str, BinOp>,
   do_parse!(
-           tag!("#")   >>
-    red:   hex_primary >>
-    green: hex_primary >>
-    blue:  hex_primary >>
-    (Color { red, green, blue })
+    lhs:   ident >>
+    opt_multispace >>
+    op:   operator >>
+    opt_multispace >>
+    rhs:   number>>
+    (BinOp{ lhs, op, rhs})
   )
 );
 
+
 fn main() {
-    println!("{:#?}", hex_color("#2F1DF1"));
-    println!("{:#?}", hex_color("#2F1DF"));
+    println!("{:#?}", hex_color("aa = 1 "));
+    println!("{:#?}", hex_color("b = 2 "));
 }
