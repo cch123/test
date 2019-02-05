@@ -2,6 +2,7 @@
 extern crate nom;
 use nom::types::CompleteStr;
 use nom::{do_parse, multispace, named, take_while};
+use nom::alt_complete;
 
 #[derive(Debug, PartialEq)]
 pub enum BoolExpr<'a> {
@@ -52,8 +53,37 @@ named!(comp_expr<CompleteStr, BoolExpr>,
   )
 );
 
+named!(or_expr<CompleteStr, BoolExpr>,
+  do_parse!(
+    left: comp_expr >> opt_multispace >>
+    tag_no_case!("or") >> opt_multispace >>
+    right : bool_expr >>
+    (BoolExpr::OrExpr{left: Box::new(left), right: Box::new(right)})
+  )
+);
+
+named!(and_expr<CompleteStr, BoolExpr>,
+  do_parse!(
+    left: comp_expr >> opt_multispace >>
+    tag_no_case!("and") >> opt_multispace >>
+    right : bool_expr >>
+    (BoolExpr::AndExpr{left: Box::new(left), right: Box::new(right)})
+  )
+);
+
+named!(bool_expr<CompleteStr, BoolExpr>,
+  alt_complete!(
+    and_expr | or_expr | comp_expr
+  )
+);
+
 fn main() {
-    println!("{:#?}", comp_expr(CompleteStr("aa >= 1")));
-    println!("{:#?}", comp_expr(CompleteStr("b = 2")));
-    println!("{:#?}", comp_expr(CompleteStr("b in 2")));
+    println!("{:#?}", bool_expr(CompleteStr("aa >= 1")));
+    println!("{:#?}", bool_expr(CompleteStr("b = 2")));
+    println!("{:#?}", bool_expr(CompleteStr("b in 2")));
+    println!("{:#?}", bool_expr(CompleteStr("b in 2 and a = 1")));
+    println!("{:#?}", bool_expr(CompleteStr("b in 2 and a = 1 and c = 2")));
+
+    // TODO fix this
+    //println!("{:#?}", bool_expr(CompleteStr("b in 2 and a = 1 and c =2")));
 }
