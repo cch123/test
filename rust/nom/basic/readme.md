@@ -9,3 +9,5 @@ https://github.com/Geal/nom/issues/839
 https://github.com/Geal/nom/issues/657
 
 看起来是因为 nom 本身可以支持流的场景，所以无法判断用户的输入是不是真的结束了，所以如果用户知道这段输入确实结束了的话，需要显式地告诉 nom 这里已经是完整的 string 了：CompleteStr。
+
+这种 parsec 的 parser 似乎也是不能处理左递归的。
