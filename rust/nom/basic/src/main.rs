@@ -2,7 +2,8 @@
 extern crate nom;
 use nom::types::CompleteStr;
 use nom::{do_parse, multispace, named, take_while};
-use nom::alt_complete;
+use nom::alt;
+use nom::fold_many0;
 
 #[derive(Debug, PartialEq)]
 pub enum BoolExpr<'a> {
@@ -72,7 +73,7 @@ named!(and_expr<CompleteStr, BoolExpr>,
 );
 
 named!(bool_expr<CompleteStr, BoolExpr>,
-  alt_complete!(
+  alt!(
     and_expr | or_expr | comp_expr
   )
 );
