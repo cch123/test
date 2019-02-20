@@ -65,3 +65,15 @@ fn f2() {
     }
     println!("{:?}", dummy.unwrap());
 }
+
+fn build_list_from_vec(v: Vec<i32>) -> Option<Box<ListNode>> {
+    let mut head = Some(Box::new(ListNode::new(0)));
+    let mut cur = head.as_mut();
+    for i in v {
+        if let Some(x) = cur {
+            x.next = Some(Box::new(ListNode::new(i)));
+            cur = x.next.as_mut();
+        }
+    }
+    head.unwrap().next
+}
