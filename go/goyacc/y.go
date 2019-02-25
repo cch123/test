@@ -11,25 +11,21 @@ import (
 	"text/scanner"
 )
 
-type Expression interface{}
-type Token struct {
-	token   int
-	literal string
-}
+const NEQStr = "!="
 
-type NumExpr struct {
-	literal string
-}
+type Expression interface{}
+
 type BinOpExpr struct {
 	left     Expression
-	operator rune
+	operator string
 	right    Expression
 }
 
 type yySymType struct {
 	yys   int
-	token Token
+	token string
 	expr  Expression
+	neq   string
 }
 
 type yyXError struct {
@@ -37,31 +33,35 @@ type yyXError struct {
 }
 
 const (
-	yyDefault = 57347
+	yyDefault = 57348
 	yyEofCode = 57344
+	NEQ       = 57347
 	NUMBER    = 57346
 	yyErrCode = 57345
 
 	yyMaxDepth = 200
-	yyTabOfs   = -4
+	yyTabOfs   = -6
 )
 
 var (
 	yyPrec = map[int]int{
 		'+': 0,
+		NEQ: 0,
 	}
 
 	yyXLAT = map[int]int{
-		57344: 0, // $end (4x)
-		43:    1, // '+' (3x)
-		57348: 2, // expr (2x)
-		57346: 3, // NUMBER (2x)
-		57349: 4, // program (1x)
-		57347: 5, // $default (0x)
-		57345: 6, // error (0x)
+		57347: 0, // NEQ (8x)
+		57344: 1, // $end (6x)
+		43:    2, // '+' (5x)
+		57349: 3, // expr (3x)
+		57346: 4, // NUMBER (3x)
+		57350: 5, // program (1x)
+		57348: 6, // $default (0x)
+		57345: 7, // error (0x)
 	}
 
 	yySymNames = []string{
+		"NEQ",
 		"$end",
 		"'+'",
 		"expr",
@@ -75,22 +75,27 @@ var (
 
 	yyReductions = map[int]struct{ xsym, components int }{
 		0: {0, 1},
-		1: {4, 1},
-		2: {2, 1},
-		3: {2, 3},
+		1: {5, 1},
+		2: {3, 1},
+		3: {3, 1},
+		4: {3, 3},
+		5: {3, 3},
 	}
 
 	yyXErrors = map[yyXError]string{}
 
-	yyParseTab = [6][]uint8{
+	yyParseTab = [9][]uint8{
 		// 0
-		{2: 6, 7, 5},
-		{4},
-		{3, 8},
-		{2, 2},
-		{2: 9, 7},
+		{10, 3: 8, 9, 7},
+		{1: 6},
+		{11, 5, 12},
+		{4, 4, 4},
+		{3, 3, 3},
 		// 5
-		{1, 1},
+		{10, 3: 14, 9},
+		{10, 3: 13, 9},
+		{1, 1, 1},
+		{2, 2, 2},
 	}
 )
 
@@ -131,7 +136,7 @@ func yylex1(yylex yyLexer, lval *yySymType) (n int) {
 }
 
 func yyParse(yylex yyLexer) int {
-	const yyError = 6
+	const yyError = 7
 
 	yyEx, _ := yylex.(yyLexerEx)
 	var yyn int
@@ -321,16 +326,24 @@ yynewstate:
 	switch r {
 	case 1:
 		{
-			yyVAL.expr = yyS[yypt-0].expr
-			yylex.(*Lexer).result = yyVAL.expr
+			yyVAL.expr = yyS[yypt-0].expr // 会把 $1 当成返回值赋值给 return val
+			yylex.(*Lexer).ast = yyVAL.expr
 		}
 	case 2:
 		{
-			yyVAL.expr = NumExpr{literal: yyS[yypt-0].token.literal}
+			yyVAL.expr = yyS[yypt-0].token
 		}
 	case 3:
 		{
-			yyVAL.expr = BinOpExpr{left: yyS[yypt-2].expr, operator: '+', right: yyS[yypt-0].expr}
+			yyVAL.expr = NEQStr
+		}
+	case 4:
+		{
+			yyVAL.expr = BinOpExpr{left: yyS[yypt-2].expr, operator: "!=", right: yyS[yypt-0].expr}
+		}
+	case 5:
+		{
+			yyVAL.expr = BinOpExpr{left: yyS[yypt-2].expr, operator: "+", right: yyS[yypt-0].expr}
 		}
 
 	}
@@ -343,7 +356,7 @@ yynewstate:
 
 type Lexer struct {
 	scanner.Scanner
-	result Expression
+	ast Expression
 }
 
 func (l *Lexer) Lex(lval *yySymType) int {
@@ -351,7 +364,16 @@ func (l *Lexer) Lex(lval *yySymType) int {
 	if token == scanner.Int {
 		token = NUMBER
 	}
-	lval.token = Token{token: token, literal: l.TokenText()}
+	println(l.TokenText())
+	if l.TokenText() == "!" {
+		token = NEQ
+		println("fuck")
+		l.Scan()
+		println(l.TokenText())
+		lval.token = "!="
+	} else {
+		lval.token = l.TokenText()
+	}
 	return token
 }
 
@@ -363,5 +385,5 @@ func main() {
 	l := new(Lexer)
 	l.Init(strings.NewReader(os.Args[1]))
 	yyParse(l)
-	fmt.Printf("%#v\n", l.result)
+	fmt.Printf("%#v\n", l.ast)
 }

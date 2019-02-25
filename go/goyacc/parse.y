@@ -8,57 +8,60 @@ import (
     "strings"
 )
 
+const NEQStr = "!="
 type Expression interface{}
-type Token struct {
-    token   int
-    literal string
-}
 
-type NumExpr struct {
-    literal string
-}
 type BinOpExpr struct {
     left     Expression
-    operator rune
+    operator string
     right    Expression
 }
 %}
 
 %union{
-    token Token
+    token string
     expr  Expression
+    neq string
 }
 
 %type<expr> program
 %type<expr> expr
 %token<token> NUMBER
+%token<token> NEQ
 
-%left '+'
+%left '+' NEQ
 
 %%
 
 program
     : expr
     {
-        $$ = $1
-        yylex.(*Lexer).result = $$
+        $$ = $1 // 会把 $1 当成返回值赋值给 return val
+        yylex.(*Lexer).ast= $$
     }
 
 expr
     : NUMBER
     {
-        $$ = NumExpr{literal: $1.literal}
+        $$ = $1
+    }
+    | NEQ
+    {
+        $$ = NEQStr
+    }
+    | expr NEQ expr
+    {
+        $$ = BinOpExpr{left: $1, operator: "!=", right: $3}
     }
     | expr '+' expr
     {
-        $$ = BinOpExpr{left: $1, operator: '+', right: $3}
+        $$ = BinOpExpr{left: $1, operator: "+", right: $3}
     }
-
 %%
 
 type Lexer struct {
     scanner.Scanner
-    result Expression
+    ast Expression
 }
 
 func (l *Lexer) Lex(lval *yySymType) int {
@@ -66,7 +69,13 @@ func (l *Lexer) Lex(lval *yySymType) int {
     if token == scanner.Int {
         token = NUMBER
     }
-    lval.token = Token{token: token, literal: l.TokenText()}
+    if l.TokenText() == "!" {
+        token = NEQ
+        l.Scan()
+        lval.token = "!="
+    } else {
+        lval.token = l.TokenText()
+    }
     return token
 }
 
@@ -78,5 +87,5 @@ func main() {
     l := new(Lexer)
     l.Init(strings.NewReader(os.Args[1]))
     yyParse(l)
-    fmt.Printf("%#v\n", l.result)
+    fmt.Printf("%#v\n", l.ast)
 }

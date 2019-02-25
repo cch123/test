@@ -2,45 +2,79 @@ state 0 //
 
     0 $accept: . program
 
+    NEQ     shift, and goto state 4
     NUMBER  shift, and goto state 3
 
     expr     goto state 2
     program  goto state 1
 
-state 1 // NUMBER [$end]
+state 1 // NEQ [$end]
 
     0 $accept: program .  [$end]
 
     $end  accept
 
-state 2 // NUMBER [$end]
+state 2 // NEQ [$end]
 
     1 program: expr .  [$end]
-    3 expr: expr . '+' expr  // assoc %left, prec 1
+    4 expr: expr . NEQ expr  // assoc %left, prec 1
+    5 expr: expr . '+' expr  // assoc %left, prec 1
 
     $end  reduce using rule 1 (program)
-    '+'   shift, and goto state 4
+    '+'   shift, and goto state 6
+    NEQ   shift, and goto state 5
 
 state 3 // NUMBER
 
-    2 expr: NUMBER .  [$end, '+']
+    2 expr: NUMBER .  [$end, '+', NEQ]
 
     $end  reduce using rule 2 (expr)
     '+'   reduce using rule 2 (expr)
+    NEQ   reduce using rule 2 (expr)
 
-state 4 // NUMBER '+'
+state 4 // NEQ
 
-    3 expr: expr '+' . expr  // assoc %left, prec 1
-
-    NUMBER  shift, and goto state 3
-
-    expr  goto state 5
-
-state 5 // NUMBER '+' NUMBER [$end]
-
-    3 expr: expr . '+' expr  // assoc %left, prec 1
-    3 expr: expr '+' expr .  [$end, '+']  // assoc %left, prec 1
+    3 expr: NEQ .  [$end, '+', NEQ]  // assoc %left, prec 1
 
     $end  reduce using rule 3 (expr)
     '+'   reduce using rule 3 (expr)
+    NEQ   reduce using rule 3 (expr)
+
+state 5 // NEQ NEQ
+
+    4 expr: expr NEQ . expr  // assoc %left, prec 1
+
+    NEQ     shift, and goto state 4
+    NUMBER  shift, and goto state 3
+
+    expr  goto state 8
+
+state 6 // NEQ '+'
+
+    5 expr: expr '+' . expr  // assoc %left, prec 1
+
+    NEQ     shift, and goto state 4
+    NUMBER  shift, and goto state 3
+
+    expr  goto state 7
+
+state 7 // NEQ '+' NEQ [$end]
+
+    4 expr: expr . NEQ expr  // assoc %left, prec 1
+    5 expr: expr . '+' expr  // assoc %left, prec 1
+    5 expr: expr '+' expr .  [$end, '+', NEQ]  // assoc %left, prec 1
+
+    $end  reduce using rule 5 (expr)
+    '+'   reduce using rule 5 (expr)
+    NEQ   reduce using rule 5 (expr)
+
+state 8 // NEQ NEQ NEQ [$end]
+
+    4 expr: expr . NEQ expr  // assoc %left, prec 1
+    4 expr: expr NEQ expr .  [$end, '+', NEQ]  // assoc %left, prec 1
+    5 expr: expr . '+' expr  // assoc %left, prec 1
+
+    $end  reduce using rule 4 (expr)
+    '+'   reduce using rule 4 (expr)
+    NEQ   reduce using rule 4 (expr)
 
