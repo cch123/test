@@ -10,32 +10,42 @@ import (
 
 type Expression interface{}
 
-type BinOpExpr struct {
-    left     Expression
-    operator string
-    right    Expression
+type CompExpr struct {
+    field string
+    op string
+    value string
+}
+
+type LogicExpr struct {
+    left Expression
+    op string
+    right Expression
 }
 %}
 
 %union{
     token string
     expr  Expression
-    bin_op string
+    comp_expr CompExpr
 }
 
 %type<expr> program
 %type<expr> expr
-%type<bin_op> bin_op
 
-%token<token> NUMBER
+%type<comp_expr> comp_expr
+
+%type<token> bin_op
+
+%token<token> field value
+%token<token> AND OR
 
 //%token<bin_op> NEQ GTE LTE
 
 // 下面的 NEQ 和 lexer 中返回的 token 应该是对应的
 // 有运算符优先级的定义的话
 // 似乎也不需要在上面的 token 进行定义了
-%left '+' '-' NEQ GTE LTE
-%left '*' '/'
+%token GT LT NEQ GTE LTE
+%left AND OR
 
 %%
 
@@ -54,14 +64,24 @@ bin_op
     | '-' { $$ = "-" }
     | '*' { $$ = "*" }
 
+comp_expr
+    : field bin_op value
+    {
+        $$ = CompExpr{field: $1, op: $2, value: $3}
+    }
+
 expr
-    : NUMBER
+    : comp_expr
     {
         $$ = $1
     }
-    | expr bin_op expr
+    | expr AND expr
     {
-        $$ = BinOpExpr{left: $1, operator: $2, right: $3}
+        $$ = LogicExpr{left: $1, op: $2, right: $3}
+    }
+    | expr OR expr
+    {
+        $$ = LogicExpr{left: $1, op: $2, right: $3}
     }
 %%
 
@@ -72,9 +92,9 @@ type Lexer struct {
 
 func (l *Lexer) Lex(lval *yySymType) int {
     token := int(l.Scan())
-    if token == scanner.Int {
-        token = NUMBER
-    }
+    //if token == scanner.Int {
+     //   token = NUMBER
+    //}
     // 这里需要额外处理一些多字符的 token 的情况
     // 比如 ! 开头的
     // 比如 a in [1,2,3,4 这种的]
@@ -91,6 +111,8 @@ func (l *Lexer) Lex(lval *yySymType) int {
     } else {
         lval.token = l.TokenText()
     }
+    if l.TokenText() == "and" {token = AND}
+    if l.TokenText() == "or" {token = OR}
     return token
 }
 
