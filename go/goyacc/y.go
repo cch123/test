@@ -11,8 +11,6 @@ import (
 	"text/scanner"
 )
 
-const NEQStr = "!="
-
 type Expression interface{}
 
 type BinOpExpr struct {
@@ -22,10 +20,10 @@ type BinOpExpr struct {
 }
 
 type yySymType struct {
-	yys   int
-	token string
-	expr  Expression
-	neq   string
+	yys    int
+	token  string
+	expr   Expression
+	bin_op string
 }
 
 type yyXError struct {
@@ -33,41 +31,60 @@ type yyXError struct {
 }
 
 const (
-	yyDefault = 57348
+	yyDefault = 57350
 	yyEofCode = 57344
+	GTE       = 57348
+	LTE       = 57349
 	NEQ       = 57347
 	NUMBER    = 57346
 	yyErrCode = 57345
 
 	yyMaxDepth = 200
-	yyTabOfs   = -6
+	yyTabOfs   = -10
 )
 
 var (
 	yyPrec = map[int]int{
 		'+': 0,
+		'-': 0,
 		NEQ: 0,
+		GTE: 0,
+		LTE: 0,
+		'*': 1,
+		'/': 1,
 	}
 
 	yyXLAT = map[int]int{
-		57347: 0, // NEQ (8x)
-		57344: 1, // $end (6x)
-		43:    2, // '+' (5x)
-		57349: 3, // expr (3x)
-		57346: 4, // NUMBER (3x)
-		57350: 5, // program (1x)
-		57348: 6, // $default (0x)
-		57345: 7, // error (0x)
+		57346: 0,  // NUMBER (8x)
+		57344: 1,  // $end (4x)
+		42:    2,  // '*' (3x)
+		43:    3,  // '+' (3x)
+		45:    4,  // '-' (3x)
+		57348: 5,  // GTE (3x)
+		57349: 6,  // LTE (3x)
+		57347: 7,  // NEQ (3x)
+		57351: 8,  // bin_op (2x)
+		57352: 9,  // expr (2x)
+		57353: 10, // program (1x)
+		57350: 11, // $default (0x)
+		47:    12, // '/' (0x)
+		57345: 13, // error (0x)
 	}
 
 	yySymNames = []string{
-		"NEQ",
-		"$end",
-		"'+'",
-		"expr",
 		"NUMBER",
+		"$end",
+		"'*'",
+		"'+'",
+		"'-'",
+		"GTE",
+		"LTE",
+		"NEQ",
+		"bin_op",
+		"expr",
 		"program",
 		"$default",
+		"'/'",
 		"error",
 	}
 
@@ -75,27 +92,35 @@ var (
 
 	yyReductions = map[int]struct{ xsym, components int }{
 		0: {0, 1},
-		1: {5, 1},
-		2: {3, 1},
-		3: {3, 1},
-		4: {3, 3},
-		5: {3, 3},
+		1: {10, 1},
+		2: {8, 1},
+		3: {8, 1},
+		4: {8, 1},
+		5: {8, 1},
+		6: {8, 1},
+		7: {8, 1},
+		8: {9, 1},
+		9: {9, 3},
 	}
 
 	yyXErrors = map[yyXError]string{}
 
-	yyParseTab = [9][]uint8{
+	yyParseTab = [12][]uint8{
 		// 0
-		{10, 3: 8, 9, 7},
-		{1: 6},
-		{11, 5, 12},
-		{4, 4, 4},
-		{3, 3, 3},
+		{13, 9: 12, 11},
+		{1: 10},
+		{1: 9, 19, 17, 18, 15, 16, 14, 20},
+		{1: 2, 2, 2, 2, 2, 2, 2},
+		{8},
 		// 5
-		{10, 3: 14, 9},
-		{10, 3: 13, 9},
-		{1, 1, 1},
-		{2, 2, 2},
+		{7},
+		{6},
+		{5},
+		{4},
+		{3},
+		// 10
+		{13, 9: 21},
+		{1: 1, 19, 17, 18, 15, 16, 14, 20},
 	}
 )
 
@@ -136,7 +161,7 @@ func yylex1(yylex yyLexer, lval *yySymType) (n int) {
 }
 
 func yyParse(yylex yyLexer) int {
-	const yyError = 7
+	const yyError = 13
 
 	yyEx, _ := yylex.(yyLexerEx)
 	var yyn int
@@ -331,19 +356,35 @@ yynewstate:
 		}
 	case 2:
 		{
-			yyVAL.expr = yyS[yypt-0].token
+			yyVAL.bin_op = "!="
 		}
 	case 3:
 		{
-			yyVAL.expr = NEQStr
+			yyVAL.bin_op = ">="
 		}
 	case 4:
 		{
-			yyVAL.expr = BinOpExpr{left: yyS[yypt-2].expr, operator: "!=", right: yyS[yypt-0].expr}
+			yyVAL.bin_op = "<="
 		}
 	case 5:
 		{
-			yyVAL.expr = BinOpExpr{left: yyS[yypt-2].expr, operator: "+", right: yyS[yypt-0].expr}
+			yyVAL.bin_op = "+"
+		}
+	case 6:
+		{
+			yyVAL.bin_op = "-"
+		}
+	case 7:
+		{
+			yyVAL.bin_op = "*"
+		}
+	case 8:
+		{
+			yyVAL.expr = yyS[yypt-0].token
+		}
+	case 9:
+		{
+			yyVAL.expr = BinOpExpr{left: yyS[yypt-2].expr, operator: yyS[yypt-1].bin_op, right: yyS[yypt-0].expr}
 		}
 
 	}
@@ -364,13 +405,19 @@ func (l *Lexer) Lex(lval *yySymType) int {
 	if token == scanner.Int {
 		token = NUMBER
 	}
-	println(l.TokenText())
+	// 这里需要额外处理一些多字符的 token 的情况
+	// 比如 ! 开头的
+	// 比如 a in [1,2,3,4 这种的]
+	// 比如 a is null 这种的
+	// >= <= 等等
 	if l.TokenText() == "!" {
 		token = NEQ
-		println("fuck")
 		l.Scan()
-		println(l.TokenText())
 		lval.token = "!="
+	} else if l.TokenText() == ">" {
+		token = GTE
+		l.Scan()
+		lval.token = ">="
 	} else {
 		lval.token = l.TokenText()
 	}

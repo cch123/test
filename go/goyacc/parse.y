@@ -8,7 +8,6 @@ import (
     "strings"
 )
 
-const NEQStr = "!="
 type Expression interface{}
 
 type BinOpExpr struct {
@@ -21,15 +20,22 @@ type BinOpExpr struct {
 %union{
     token string
     expr  Expression
-    neq string
+    bin_op string
 }
 
 %type<expr> program
 %type<expr> expr
-%token<token> NUMBER
-%token<token> NEQ
+%type<bin_op> bin_op
 
-%left '+' NEQ
+%token<token> NUMBER
+
+//%token<bin_op> NEQ GTE LTE
+
+// 下面的 NEQ 和 lexer 中返回的 token 应该是对应的
+// 有运算符优先级的定义的话
+// 似乎也不需要在上面的 token 进行定义了
+%left '+' '-' NEQ GTE LTE
+%left '*' '/'
 
 %%
 
@@ -40,22 +46,22 @@ program
         yylex.(*Lexer).ast= $$
     }
 
+bin_op
+    : NEQ { $$ = "!="}
+    | GTE { $$ = ">=" }
+    | LTE { $$ = "<=" }
+    | '+' { $$ = "+" }
+    | '-' { $$ = "-" }
+    | '*' { $$ = "*" }
+
 expr
     : NUMBER
     {
         $$ = $1
     }
-    | NEQ
+    | expr bin_op expr
     {
-        $$ = NEQStr
-    }
-    | expr NEQ expr
-    {
-        $$ = BinOpExpr{left: $1, operator: "!=", right: $3}
-    }
-    | expr '+' expr
-    {
-        $$ = BinOpExpr{left: $1, operator: "+", right: $3}
+        $$ = BinOpExpr{left: $1, operator: $2, right: $3}
     }
 %%
 
@@ -69,10 +75,19 @@ func (l *Lexer) Lex(lval *yySymType) int {
     if token == scanner.Int {
         token = NUMBER
     }
+    // 这里需要额外处理一些多字符的 token 的情况
+    // 比如 ! 开头的
+    // 比如 a in [1,2,3,4 这种的]
+    // 比如 a is null 这种的
+    // >= <= 等等
     if l.TokenText() == "!" {
         token = NEQ
         l.Scan()
         lval.token = "!="
+    } else if l.TokenText() ==">" {
+        token = GTE
+        l.Scan()
+        lval.token = ">="
     } else {
         lval.token = l.TokenText()
     }

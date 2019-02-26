@@ -2,79 +2,107 @@ state 0 //
 
     0 $accept: . program
 
-    NEQ     shift, and goto state 4
     NUMBER  shift, and goto state 3
 
     expr     goto state 2
     program  goto state 1
 
-state 1 // NEQ [$end]
+state 1 // NUMBER [$end]
 
     0 $accept: program .  [$end]
 
     $end  accept
 
-state 2 // NEQ [$end]
+state 2 // NUMBER [$end]
 
     1 program: expr .  [$end]
-    4 expr: expr . NEQ expr  // assoc %left, prec 1
-    5 expr: expr . '+' expr  // assoc %left, prec 1
+    9 expr: expr . bin_op expr
 
     $end  reduce using rule 1 (program)
-    '+'   shift, and goto state 6
-    NEQ   shift, and goto state 5
+    '*'   shift, and goto state 9
+    '+'   shift, and goto state 7
+    '-'   shift, and goto state 8
+    GTE   shift, and goto state 5
+    LTE   shift, and goto state 6
+    NEQ   shift, and goto state 4
+
+    bin_op  goto state 10
 
 state 3 // NUMBER
 
-    2 expr: NUMBER .  [$end, '+', NEQ]
+    8 expr: NUMBER .  [$end, '*', '+', '-', GTE, LTE, NEQ]
 
-    $end  reduce using rule 2 (expr)
-    '+'   reduce using rule 2 (expr)
-    NEQ   reduce using rule 2 (expr)
+    $end  reduce using rule 8 (expr)
+    '*'   reduce using rule 8 (expr)
+    '+'   reduce using rule 8 (expr)
+    '-'   reduce using rule 8 (expr)
+    GTE   reduce using rule 8 (expr)
+    LTE   reduce using rule 8 (expr)
+    NEQ   reduce using rule 8 (expr)
 
-state 4 // NEQ
+state 4 // NUMBER NEQ
 
-    3 expr: NEQ .  [$end, '+', NEQ]  // assoc %left, prec 1
+    2 bin_op: NEQ .  [NUMBER]  // assoc %left, prec 1
 
-    $end  reduce using rule 3 (expr)
-    '+'   reduce using rule 3 (expr)
-    NEQ   reduce using rule 3 (expr)
+    NUMBER  reduce using rule 2 (bin_op)
 
-state 5 // NEQ NEQ
+state 5 // NUMBER GTE
 
-    4 expr: expr NEQ . expr  // assoc %left, prec 1
+    3 bin_op: GTE .  [NUMBER]  // assoc %left, prec 1
 
-    NEQ     shift, and goto state 4
+    NUMBER  reduce using rule 3 (bin_op)
+
+state 6 // NUMBER LTE
+
+    4 bin_op: LTE .  [NUMBER]  // assoc %left, prec 1
+
+    NUMBER  reduce using rule 4 (bin_op)
+
+state 7 // NUMBER '+'
+
+    5 bin_op: '+' .  [NUMBER]  // assoc %left, prec 1
+
+    NUMBER  reduce using rule 5 (bin_op)
+
+state 8 // NUMBER '-'
+
+    6 bin_op: '-' .  [NUMBER]  // assoc %left, prec 1
+
+    NUMBER  reduce using rule 6 (bin_op)
+
+state 9 // NUMBER '*'
+
+    7 bin_op: '*' .  [NUMBER]  // assoc %left, prec 2
+
+    NUMBER  reduce using rule 7 (bin_op)
+
+state 10 // NUMBER '*' [NUMBER]
+
+    9 expr: expr bin_op . expr
+
     NUMBER  shift, and goto state 3
 
-    expr  goto state 8
+    expr  goto state 11
 
-state 6 // NEQ '+'
+state 11 // NUMBER '*' NUMBER [$end]
 
-    5 expr: expr '+' . expr  // assoc %left, prec 1
+    9 expr: expr . bin_op expr
+    9 expr: expr bin_op expr .  [$end, '*', '+', '-', GTE, LTE, NEQ]
 
-    NEQ     shift, and goto state 4
-    NUMBER  shift, and goto state 3
+    $end  reduce using rule 9 (expr)
+    '*'   shift, and goto state 9
+    '+'   shift, and goto state 7
+    '-'   shift, and goto state 8
+    GTE   shift, and goto state 5
+    LTE   shift, and goto state 6
+    NEQ   shift, and goto state 4
 
-    expr  goto state 7
+    bin_op  goto state 10
 
-state 7 // NEQ '+' NEQ [$end]
-
-    4 expr: expr . NEQ expr  // assoc %left, prec 1
-    5 expr: expr . '+' expr  // assoc %left, prec 1
-    5 expr: expr '+' expr .  [$end, '+', NEQ]  // assoc %left, prec 1
-
-    $end  reduce using rule 5 (expr)
-    '+'   reduce using rule 5 (expr)
-    NEQ   reduce using rule 5 (expr)
-
-state 8 // NEQ NEQ NEQ [$end]
-
-    4 expr: expr . NEQ expr  // assoc %left, prec 1
-    4 expr: expr NEQ expr .  [$end, '+', NEQ]  // assoc %left, prec 1
-    5 expr: expr . '+' expr  // assoc %left, prec 1
-
-    $end  reduce using rule 4 (expr)
-    '+'   reduce using rule 4 (expr)
-    NEQ   reduce using rule 4 (expr)
+    conflict on '*', shift, and goto state 9, reduce using rule 9 // '*': assoc %left, prec 2
+    conflict on '+', shift, and goto state 7, reduce using rule 9 // '+': assoc %left, prec 1
+    conflict on '-', shift, and goto state 8, reduce using rule 9 // '-': assoc %left, prec 1
+    conflict on GTE, shift, and goto state 5, reduce using rule 9 // GTE: assoc %left, prec 1
+    conflict on LTE, shift, and goto state 6, reduce using rule 9 // LTE: assoc %left, prec 1
+    conflict on NEQ, shift, and goto state 4, reduce using rule 9 // NEQ: assoc %left, prec 1
 
