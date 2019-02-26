@@ -29,7 +29,7 @@ type yySymType struct {
 	yys       int
 	token     string
 	expr      Expression
-	comp_expr CompExpr
+	comp_expr Expression
 }
 
 type yyXError struct {
@@ -37,21 +37,18 @@ type yyXError struct {
 }
 
 const (
-	yyDefault = 57355
+	yyDefault = 57352
 	yyEofCode = 57344
-	AND       = 57348
-	GT        = 57350
-	GTE       = 57353
-	LT        = 57351
-	LTE       = 57354
-	NEQ       = 57352
-	OR        = 57349
+	AND       = 57347
+	EQ        = 57351
+	FIELD     = 57346
+	GTE       = 57349
+	NEQ       = 57350
+	OR        = 57348
 	yyErrCode = 57345
-	field     = 57346
-	value     = 57347
 
 	yyMaxDepth = 200
-	yyTabOfs   = -12
+	yyTabOfs   = -8
 )
 
 var (
@@ -61,90 +58,69 @@ var (
 	}
 
 	yyXLAT = map[int]int{
-		57347: 0,  // value (7x)
-		57344: 1,  // $end (6x)
-		57348: 2,  // AND (5x)
-		57349: 3,  // OR (5x)
-		57357: 4,  // comp_expr (3x)
-		57358: 5,  // expr (3x)
-		57346: 6,  // field (3x)
-		42:    7,  // '*' (1x)
-		43:    8,  // '+' (1x)
-		45:    9,  // '-' (1x)
-		57356: 10, // bin_op (1x)
-		57353: 11, // GTE (1x)
-		57354: 12, // LTE (1x)
-		57352: 13, // NEQ (1x)
-		57359: 14, // program (1x)
-		57355: 15, // $default (0x)
-		57345: 16, // error (0x)
-		57350: 17, // GT (0x)
-		57351: 18, // LT (0x)
+		57344: 0,  // $end (6x)
+		57346: 1,  // FIELD (6x)
+		57347: 2,  // AND (5x)
+		57348: 3,  // OR (5x)
+		57354: 4,  // comp_expr (3x)
+		57355: 5,  // expr (3x)
+		57353: 6,  // bin_op (1x)
+		57351: 7,  // EQ (1x)
+		57350: 8,  // NEQ (1x)
+		57356: 9,  // program (1x)
+		57352: 10, // $default (0x)
+		57345: 11, // error (0x)
+		57349: 12, // GTE (0x)
 	}
 
 	yySymNames = []string{
-		"value",
 		"$end",
+		"FIELD",
 		"AND",
 		"OR",
 		"comp_expr",
 		"expr",
-		"field",
-		"'*'",
-		"'+'",
-		"'-'",
 		"bin_op",
-		"GTE",
-		"LTE",
+		"EQ",
 		"NEQ",
 		"program",
 		"$default",
 		"error",
-		"GT",
-		"LT",
+		"GTE",
 	}
 
 	yyTokenLiteralStrings = map[int]string{}
 
 	yyReductions = map[int]struct{ xsym, components int }{
-		0:  {0, 1},
-		1:  {14, 1},
-		2:  {10, 1},
-		3:  {10, 1},
-		4:  {10, 1},
-		5:  {10, 1},
-		6:  {10, 1},
-		7:  {10, 1},
-		8:  {4, 3},
-		9:  {5, 1},
-		10: {5, 3},
-		11: {5, 3},
+		0: {0, 1},
+		1: {9, 1},
+		2: {6, 1},
+		3: {6, 1},
+		4: {4, 3},
+		5: {5, 3},
+		6: {5, 3},
+		7: {5, 1},
 	}
 
 	yyXErrors = map[yyXError]string{}
 
-	yyParseTab = [17][]uint8{
+	yyParseTab = [13][]uint8{
 		// 0
-		{4: 16, 14, 15, 14: 13},
-		{1: 12},
-		{1: 11, 25, 26},
-		{7: 22, 20, 21, 23, 18, 19, 17},
-		{1: 3, 3, 3},
-		// 5
-		{10},
-		{9},
+		{1: 11, 4: 12, 10, 9: 9},
 		{8},
-		{7},
-		{6},
+		{7, 2: 17, 18},
+		{6: 15, 14, 13},
+		{1, 2: 1, 1},
+		// 5
+		{1: 6},
+		{1: 5},
+		{1: 16},
+		{4, 2: 4, 4},
+		{1: 11, 4: 12, 20},
 		// 10
-		{5},
-		{24},
-		{1: 4, 4, 4},
-		{4: 16, 28, 15},
-		{4: 16, 27, 15},
-		// 15
-		{1: 1, 1, 1},
-		{1: 2, 2, 2},
+		{1: 11, 4: 12, 19},
+		{2, 2: 2, 2},
+		{3, 2: 3, 3},
 	}
 )
 
@@ -185,7 +161,7 @@ func yylex1(yylex yyLexer, lval *yySymType) (n int) {
 }
 
 func yyParse(yylex yyLexer) int {
-	const yyError = 16
+	const yyError = 11
 
 	yyEx, _ := yylex.(yyLexerEx)
 	var yyn int
@@ -384,39 +360,23 @@ yynewstate:
 		}
 	case 3:
 		{
-			yyVAL.token = ">="
+			yyVAL.token = "="
 		}
 	case 4:
 		{
-			yyVAL.token = "<="
+			yyVAL.comp_expr = CompExpr{field: yyS[yypt-2].token, op: "xx", value: yyS[yypt-0].token}
 		}
 	case 5:
 		{
-			yyVAL.token = "+"
+			yyVAL.expr = LogicExpr{left: yyS[yypt-2].expr, op: yyS[yypt-1].token, right: yyS[yypt-0].expr}
 		}
 	case 6:
 		{
-			yyVAL.token = "-"
+			yyVAL.expr = LogicExpr{left: yyS[yypt-2].expr, op: yyS[yypt-1].token, right: yyS[yypt-0].expr}
 		}
 	case 7:
 		{
-			yyVAL.token = "*"
-		}
-	case 8:
-		{
-			yyVAL.comp_expr = CompExpr{field: yyS[yypt-2].token, op: yyS[yypt-1].token, value: yyS[yypt-0].token}
-		}
-	case 9:
-		{
 			yyVAL.expr = yyS[yypt-0].comp_expr
-		}
-	case 10:
-		{
-			yyVAL.expr = LogicExpr{left: yyS[yypt-2].expr, op: yyS[yypt-1].token, right: yyS[yypt-0].expr}
-		}
-	case 11:
-		{
-			yyVAL.expr = LogicExpr{left: yyS[yypt-2].expr, op: yyS[yypt-1].token, right: yyS[yypt-0].expr}
 		}
 
 	}
@@ -434,14 +394,14 @@ type Lexer struct {
 
 func (l *Lexer) Lex(lval *yySymType) int {
 	token := int(l.Scan())
-	//if token == scanner.Int {
-	//   token = NUMBER
-	//}
 	// 这里需要额外处理一些多字符的 token 的情况
 	// 比如 ! 开头的
 	// 比如 a in [1,2,3,4 这种的]
 	// 比如 a is null 这种的
 	// >= <= 等等
+	if token == scanner.Int {
+		token = FIELD
+	}
 	if l.TokenText() == "!" {
 		token = NEQ
 		l.Scan()
@@ -453,12 +413,15 @@ func (l *Lexer) Lex(lval *yySymType) int {
 	} else {
 		lval.token = l.TokenText()
 	}
-	if l.TokenText() == "and" {
+	switch l.TokenText() {
+	case "=":
+		token = EQ
+	case "and":
 		token = AND
-	}
-	if l.TokenText() == "or" {
+	case "or":
 		token = OR
 	}
+	println(lval.token, token)
 	return token
 }
 

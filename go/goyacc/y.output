@@ -2,134 +2,106 @@ state 0 //
 
     0 $accept: . program
 
-    field  shift, and goto state 3
+    FIELD  shift, and goto state 3
 
     comp_expr  goto state 4
     expr       goto state 2
     program    goto state 1
 
-state 1 // field '*' value [$end]
+state 1 // FIELD EQ FIELD [$end]
 
     0 $accept: program .  [$end]
 
     $end  accept
 
-state 2 // field '*' value [$end]
+state 2 // FIELD EQ FIELD [$end]
 
     1 program: expr .  [$end]
-   10 expr: expr . AND expr  // assoc %left, prec 1
-   11 expr: expr . OR expr  // assoc %left, prec 1
+    5 expr: expr . AND expr  // assoc %left, prec 1
+    6 expr: expr . OR expr  // assoc %left, prec 1
 
     $end  reduce using rule 1 (program)
-    AND   shift, and goto state 13
-    OR    shift, and goto state 14
+    AND   shift, and goto state 9
+    OR    shift, and goto state 10
 
-state 3 // field
+state 3 // FIELD
 
-    8 comp_expr: field . bin_op value
+    4 comp_expr: FIELD . bin_op FIELD
 
-    '*'  shift, and goto state 10
-    '+'  shift, and goto state 8
-    '-'  shift, and goto state 9
-    GTE  shift, and goto state 6
-    LTE  shift, and goto state 7
+    EQ   shift, and goto state 6
     NEQ  shift, and goto state 5
 
-    bin_op  goto state 11
+    bin_op  goto state 7
 
-state 4 // field '*' value [$end]
+state 4 // FIELD EQ FIELD [$end]
 
-    9 expr: comp_expr .  [$end, AND, OR]
+    7 expr: comp_expr .  [$end, AND, OR]
 
-    $end  reduce using rule 9 (expr)
-    AND   reduce using rule 9 (expr)
-    OR    reduce using rule 9 (expr)
+    $end  reduce using rule 7 (expr)
+    AND   reduce using rule 7 (expr)
+    OR    reduce using rule 7 (expr)
 
-state 5 // field NEQ
+state 5 // FIELD NEQ
 
-    2 bin_op: NEQ .  [value]
+    2 bin_op: NEQ .  [FIELD]
 
-    value  reduce using rule 2 (bin_op)
+    FIELD  reduce using rule 2 (bin_op)
 
-state 6 // field GTE
+state 6 // FIELD EQ
 
-    3 bin_op: GTE .  [value]
+    3 bin_op: EQ .  [FIELD]
 
-    value  reduce using rule 3 (bin_op)
+    FIELD  reduce using rule 3 (bin_op)
 
-state 7 // field LTE
+state 7 // FIELD EQ [FIELD]
 
-    4 bin_op: LTE .  [value]
+    4 comp_expr: FIELD bin_op . FIELD
 
-    value  reduce using rule 4 (bin_op)
+    FIELD  shift, and goto state 8
 
-state 8 // field '+'
+state 8 // FIELD EQ FIELD
 
-    5 bin_op: '+' .  [value]
+    4 comp_expr: FIELD bin_op FIELD .  [$end, AND, OR]
 
-    value  reduce using rule 5 (bin_op)
+    $end  reduce using rule 4 (comp_expr)
+    AND   reduce using rule 4 (comp_expr)
+    OR    reduce using rule 4 (comp_expr)
 
-state 9 // field '-'
+state 9 // FIELD EQ FIELD AND
 
-    6 bin_op: '-' .  [value]
+    5 expr: expr AND . expr  // assoc %left, prec 1
 
-    value  reduce using rule 6 (bin_op)
-
-state 10 // field '*'
-
-    7 bin_op: '*' .  [value]
-
-    value  reduce using rule 7 (bin_op)
-
-state 11 // field '*' [value]
-
-    8 comp_expr: field bin_op . value
-
-    value  shift, and goto state 12
-
-state 12 // field '*' value
-
-    8 comp_expr: field bin_op value .  [$end, AND, OR]
-
-    $end  reduce using rule 8 (comp_expr)
-    AND   reduce using rule 8 (comp_expr)
-    OR    reduce using rule 8 (comp_expr)
-
-state 13 // field '*' value AND
-
-   10 expr: expr AND . expr  // assoc %left, prec 1
-
-    field  shift, and goto state 3
+    FIELD  shift, and goto state 3
 
     comp_expr  goto state 4
-    expr       goto state 16
+    expr       goto state 12
 
-state 14 // field '*' value OR
+state 10 // FIELD EQ FIELD OR
 
-   11 expr: expr OR . expr  // assoc %left, prec 1
+    6 expr: expr OR . expr  // assoc %left, prec 1
 
-    field  shift, and goto state 3
+    FIELD  shift, and goto state 3
 
     comp_expr  goto state 4
-    expr       goto state 15
+    expr       goto state 11
 
-state 15 // field '*' value OR field '*' value [$end]
+state 11 // FIELD EQ FIELD OR FIELD EQ FIELD [$end]
 
-   10 expr: expr . AND expr  // assoc %left, prec 1
-   11 expr: expr . OR expr  // assoc %left, prec 1
-   11 expr: expr OR expr .  [$end, AND, OR]  // assoc %left, prec 1
+    5 expr: expr . AND expr  // assoc %left, prec 1
+    6 expr: expr . OR expr  // assoc %left, prec 1
+    6 expr: expr OR expr .  [$end, AND, OR]  // assoc %left, prec 1
 
-    $end  reduce using rule 11 (expr)
-    AND   reduce using rule 11 (expr)
-    OR    reduce using rule 11 (expr)
+    $end  reduce using rule 6 (expr)
+    AND   reduce using rule 6 (expr)
+    OR    reduce using rule 6 (expr)
 
-state 16 // field '*' value AND field '*' value [$end]
+state 12 // FIELD EQ FIELD AND FIELD EQ FIELD [$end]
 
-   10 expr: expr . AND expr  // assoc %left, prec 1
-   10 expr: expr AND expr .  [$end, AND, OR]  // assoc %left, prec 1
-   11 expr: expr . OR expr  // assoc %left, prec 1
+    5 expr: expr . AND expr  // assoc %left, prec 1
+    5 expr: expr AND expr .  [$end, AND, OR]  // assoc %left, prec 1
+    6 expr: expr . OR expr  // assoc %left, prec 1
 
-    $end  reduce using rule 10 (expr)
-    AND   reduce using rule 10 (expr)
-    OR    reduce using rule 10 (expr)
+    $end  reduce using rule 5 (expr)
+    AND   reduce using rule 5 (expr)
+    OR    reduce using rule 5 (expr)
 
