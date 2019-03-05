@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
 
 func main() {
 	var ruleMap = map[string][]string{
@@ -9,14 +12,22 @@ func main() {
 		"and_expr":  []string{},
 	}
 	for k, rules := range ruleMap {
-		recordMap := map[string]struct{}{}
-		insertRec := func(k string) {
-			recordMap[k] = struct{}{}
+		recordMap := map[string]struct{}{
+			k: struct{}{},
 		}
 		// TODO
+		var nextLines = rules
+		for len(nextLines) > 0 {
+			var toBeAppend []string
+			for _, l := range nextLines {
+				if _, ok := recordMap[l]; ok {
+					fmt.Println("left recursion exist!", l, recordMap)
+					os.Exit(1)
+				}
+				recordMap[l] = struct{}{}
+				toBeAppend = append(toBeAppend, rules...)
+			}
+		}
 	}
 	fmt.Println(ruleMap)
-}
-
-func traverseNextLine(ruleMap map[string][]string, insert func(string)) bool {
 }
