@@ -1,0 +1,157 @@
+== Introduction
+
+This is my first time to use asciidoctor, is this language better than markdown? I don't know currently. Hoping to get familiar to this, and write a book in this markup language.
+
+[#system_overview,reftext='{figure-caption} {counter:refnum}']
+.Check this
+image::timecalc.png[]
+
+as <<system_overview>>
+ say this is the end.
+
+
+
+=== Second Chapter
+
+.ditaa Diagram Example
+[ditaa,file="ditaa-example.png"]
+--
+    +--------+   +-------+    +-------+
+    |        |---+ ditaa +--->|       |
+    |  Text  |   +-------+    |diagram|
+    |Document|   |!magic!|    |       |
+    |     {d}|   |       |    |       |
+    +---+----+   +-------+    +-------+
+        :                         ^
+        |       Lots of work      |
+        +-------------------------+
+--
+
+
+.UML Diagram Example
+[uml,file="uml-example.png"]
+--
+abstract class AbstractList
+abstract AbstractCollection
+interface List
+interface Collection
+
+List <|-- AbstractList
+Collection <|-- AbstractCollection
+
+Collection <|- List
+AbstractCollection <|- AbstractList
+AbstractList <|-- ArrayList
+
+class ArrayList {
+  Object[] elementData
+  size()
+}
+
+enum TimeUnit {
+  DAYS
+  HOURS
+  MINUTES
+}
+
+annotation SuppressWarnings
+--
+
+
+[tree,file="tree-view.png"]
+--
+#src
+##main
+###java
+####com
+#####kodcu
+######App.java
+###resources
+####css
+#####style.css
+####js
+#####script.js
+####images
+#####image.png
+--
+
+
+.Code block
+[source,go]
+----
+package main
+
+func main() {
+    fmt.Println("hello world")
+    sort.Slice(intList, func(x,y int) bool {return intList[x] < intList[y]}
+}
+----
+
+
+.Quote Block
+____
+AspectJ dilinin kullandığı yapılar 3 kısımda toplanmıştır.
+
+Bunlar:: Ortak, Dinamik ve Statik crosscutting (enine kesen) bölümlerdir.
+
+Bu bölümler, içlerinde farklı bileşenleri toplayarak bizim mevcut *OOP* sistemimizi *AOP* mantığı ile harmanlamamıza imkan veriyorlar.
+____
+
+
+
+.Not bloğu
+[NOTE]
+====
+Burası bir not bloğu
+====
+
+.Önemli bloğu
+[IMPORTANT]
+====
+Burası bir önemli bloğu
+====
+
+.İpucu bloğu
+[TIP]
+====
+Burası bir ipucu bloğu
+====
+
+.Dikkat bloğu
+[CAUTION]
+====
+Burası bir dikkat bloğu
+====
+
+.Uyarı bloğu
+[WARNING]
+====
+this is warning content
+====
+
+
+.Code block
+[source,java]
+----
+public interface Hello {
+
+    void hello();
+
+}
+----
+
+You can use numbered elements named `callouts` in Asciidoc.
+
+.Numbered code block
+[source,ruby]
+----
+require 'sinatra' // <1>
+
+get '/hi' do // <2>
+  "Hello World!" // <3>
+end
+----
+<1> Library import
+<2> URL mapping
+<3> Content for response
+
