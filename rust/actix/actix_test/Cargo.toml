@@ -1,0 +1,13 @@
+[package]
+name = "actix_test"
+version = "0.1.0"
+authors = ["Xargin <cao1988228@163.com>"]
+edition = "2018"
+
+[dependencies]
+actix-web = "1.0"
+futures = "0.1.25"
+http = "0.1.0"
+
+[dev-dependencies]
+env_logger = "0.6"
