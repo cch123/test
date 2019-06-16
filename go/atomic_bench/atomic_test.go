@@ -3,7 +3,10 @@ package main
 import "testing"
 
 func BenchmarkAtomic(b * testing.B) {
-	for i:=0;i<b.N;i++{
-		atomicStore(i)
-	}
+		b.SetParallelism(100)
+		b.RunParallel(func(pb *testing.PB) {
+			for pb.Next() {
+				atomicStore(0)
+			}
+		})
 }
