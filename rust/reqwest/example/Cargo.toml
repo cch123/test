@@ -1,0 +1,9 @@
+[package]
+name = "example"
+version = "0.1.0"
+authors = ["Xargin <cao1988228@163.com>"]
+edition = "2018"
+
+[dependencies]
+reqwest = "^0.9.18"
+serde_json = "1.0.40"

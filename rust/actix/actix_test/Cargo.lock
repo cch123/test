@@ -219,6 +219,7 @@ dependencies = [
 name = "actix_test"
 version = "0.1.0"
 dependencies = [
+ "actix-http 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "actix-web 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "env_logger 0.6.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "futures 0.1.27 (registry+https://github.com/rust-lang/crates.io-index)",

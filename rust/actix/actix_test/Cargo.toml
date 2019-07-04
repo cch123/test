@@ -8,6 +8,7 @@ edition = "2018"
 actix-web = "1.0"
 futures = "0.1.25"
 http = "0.1.0"
+actix-http = "0.2.3"
 
 [dev-dependencies]
 env_logger = "0.6"
