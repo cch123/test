@@ -5,7 +5,7 @@ fn main() -> Result<(), Box<::std::error::Error>> {
     let client = Client::new();
 
     let mut resp = client
-        .post("http://httpbin.org/post")
+        .get("https://www.collinsdictionary.com/autocomplete/?dictCode=english&q=ab")
         .send()?;
 
     /*
