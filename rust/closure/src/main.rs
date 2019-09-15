@@ -126,3 +126,36 @@ fn main2() {
     apply(clo);
     //apply2(clo);
 }
+
+
+use std::collections::HashMap;
+/*
+struct Router <C> where C : Fn(i32) -> i32 {
+    routes : HashMap<String, Box<C>>,
+}
+*/
+// programming rust
+// page 318
+struct Router {
+    routes : HashMap<String, Box<Fn(i32)->i32>>,
+}
+
+type C = Box<Fn(i32) -> i32>;
+
+//impl <C> Router<C> where C: Fn(i32) -> i32 {
+impl Router {
+    fn new() -> Self {
+        Router {
+            routes: HashMap::new(),
+        }
+    }
+
+    fn add_route<Cl>(&mut self, url : &str, callback: Cl) where Cl : Fn(i32)->i32 + 'static {
+        self.routes.insert(url.to_string(), Box::new(callback));
+    }
+}
+fn main3() {
+    let mut router = Router::new();
+    router.add_route("/getid",|x| x + 1);
+    router.add_route("/getidx",|x| x + 2);
+}
