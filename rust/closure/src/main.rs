@@ -68,6 +68,14 @@ where
     f();
 }
 
+// apply2 和 apply 是等价的
+// trait 作为参数和返回值都可以尝试写成 impl 形式
+// 不过如果是 Fn、FnMut、FnOnce，这样写可能比较乱
+// 所以才会用 where 形式
+fn apply2(f: impl FnOnce()) {
+    f();
+}
+
 // 返回闭包
 fn get_cl() -> impl FnOnce(i32) {
     let x = move |mut i: i32| {
@@ -116,4 +124,5 @@ fn main2() {
         std::mem::drop(y);
     };
     apply(clo);
+    //apply2(clo);
 }
