@@ -68,6 +68,14 @@ where
     f();
 }
 
+// apply2 和 apply 是等价的
+// trait 作为参数和返回值都可以尝试写成 impl 形式
+// 不过如果是 Fn、FnMut、FnOnce，这样写可能比较乱
+// 所以才会用 where 形式
+fn apply2(f: impl FnOnce()) {
+    f();
+}
+
 // 返回闭包
 fn get_cl() -> impl FnOnce(i32) {
     let x = move |mut i: i32| {
@@ -116,9 +124,38 @@ fn main2() {
         std::mem::drop(y);
     };
     apply(clo);
+    //apply2(clo);
 }
 
-fn apply2<A, B, C, G>(mut f: impl FnMut(B) -> G, a: A)
+
+use std::collections::HashMap;
+/*
+struct Router <C> where C : Fn(i32) -> i32 {
+    routes : HashMap<String, Box<C>>,
+}
+*/
+// programming rust
+// page 318
+struct Router {
+    routes : HashMap<String, Box<dyn Fn(i32)->i32>>,
+}
+
+type C = Box<dyn Fn(i32) -> i32>;
+
+//impl <C> Router<C> where C: Fn(i32) -> i32 {
+impl Router {
+    fn new() -> Self {
+        Router {
+            routes: HashMap::new(),
+        }
+    }
+
+    fn add_route<Cl>(&mut self, url : &str, callback: Cl) where Cl : Fn(i32)->i32 + 'static {
+        self.routes.insert(url.to_string(), Box::new(callback));
+    }
+}
+
+fn apply4<A, B, C, G>(mut f: impl FnMut(B) -> G, a: A)
 -> impl FnMut(&B) -> C
         where  
              G: FnMut(A) -> C,
@@ -127,10 +164,19 @@ fn apply2<A, B, C, G>(mut f: impl FnMut(B) -> G, a: A)
     move |b| f(*b)(a.clone())
 }
 
+/*
+不能嵌套 impl
 fn apply3<A, B, C, G>(mut f: impl FnMut(B) -> impl FnMut(A)-> C, a: A)
 -> impl FnMut(&B) -> C
         where  
              B: Copy,
              A: Clone {
     move |b| f(*b)(a.clone())
+}
+*/
+
+fn main3() {
+    let mut router = Router::new();
+    router.add_route("/getid",|x| x + 1);
+    router.add_route("/getidx",|x| x + 2);
 }
