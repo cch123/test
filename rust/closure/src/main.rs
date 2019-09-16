@@ -117,3 +117,20 @@ fn main2() {
     };
     apply(clo);
 }
+
+fn apply2<A, B, C, G>(mut f: impl FnMut(B) -> G, a: A)
+-> impl FnMut(&B) -> C
+        where  
+             G: FnMut(A) -> C,
+             B: Copy,
+             A: Clone {
+    move |b| f(*b)(a.clone())
+}
+
+fn apply3<A, B, C, G>(mut f: impl FnMut(B) -> impl FnMut(A)-> C, a: A)
+-> impl FnMut(&B) -> C
+        where  
+             B: Copy,
+             A: Clone {
+    move |b| f(*b)(a.clone())
+}
