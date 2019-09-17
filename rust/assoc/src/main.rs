@@ -7,8 +7,24 @@ trait Graph {
     fn get_successors(&self, n: &Self::Node) -> Vec<Self::Node>;
 }
 
-impl<N, E> dyn Graph<Node=N, Edge=E>
-{
+impl <T>Graph for T {
+    type Node = T;
+    type Edge = T;
+
+    fn get_visited(&self, n: &Self::Node) -> bool {
+        true
+    }
+
+    fn set_visited(&mut self, n: &Self::Node) {
+    }
+
+    fn get_successors(&self, n: &Self::Node) -> Vec<Self::Node> {
+        vec![]
+    }
+}
+
+/*
+impl<N, E> dyn Graph<Node = N, Edge = E> {
     fn get_visited(&self, n: N) -> bool {
         true
     }
@@ -19,20 +35,7 @@ impl<N, E> dyn Graph<Node=N, Edge=E>
         vec![]
     }
 }
-
-impl Graph for i32 {
-    type Node = i32;
-    type Edge = i32;
-    fn get_visited(&self, n: &Self::Node) -> bool {
-        true
-    }
-
-    fn set_visited(&mut self, n: &Self::Node) {}
-
-    fn get_successors(&self, n: &Self::Node) -> Vec<Self::Node> {
-        vec![]
-    }
-}
+*/
 
 // 完全独立的泛型函数
 fn dfs<G>(g: &mut G) -> Vec<G::Node>
@@ -43,5 +46,8 @@ where
 }
 
 fn main() {
-    //let mut g = Graph<i32,i32>::new();
+    let mut g: &dyn Graph<Node=i64, Edge=i64> = &10;
+    println!("{}", g.get_visited(&12));
+    let mut g: &dyn Graph<Node = String, Edge = String> = &"a".to_string();
+    println!("{}", g.get_visited(&"zz".to_string()));
 }
