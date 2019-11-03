@@ -1,0 +1,14 @@
+[package]
+name = "async_closure"
+version = "0.1.0"
+authors = ["xargin <cao1988228@163.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+reqwest = "0.10.0-alpha.1"
+tokio = "0.2.0-alpha.6"
+serde_json = "1.0.41"
+serde = "1.0.102"
+serde_derive = "1.0.102"
