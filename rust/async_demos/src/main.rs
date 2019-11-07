@@ -1,7 +1,10 @@
 #![feature(async_closure)]
 
 use futures::executor::block_on;
+use futures::FutureExt;
 use std::pin::Pin;
+use tokio::sync::mpsc;
+use tokio::sync::oneshot;
 
 #[tokio::main]
 async fn main() {
@@ -10,6 +13,89 @@ async fn main() {
     execute_future_in_non_async_functions();
     join_all_async_block_in_various_ways().await;
     async_block_and_async_fn_are_alike().await;
+
+    futures_can_be_selected().await;
+
+    // producer - consumer
+    channel_like_go_buffered().await;
+    channel_like_go_oneshot().await;
+}
+
+async fn channel_like_go_oneshot() {
+    let (tx, rx) = oneshot::channel();
+
+    tokio::spawn(async move {
+        if let Err(_) = tx.send("hell") {
+            println!("the receiver dropped");
+        }
+    });
+
+    match rx.await {
+        Ok(v) => println!("got = {:?}", v),
+        Err(_) => println!("the sender dropped"),
+    }
+}
+
+async fn channel_like_go_buffered() {
+    let (mut tx, mut rx) = mpsc::channel(100);
+
+    tokio::spawn(async move {
+        for i in 0..10 {
+            if let Err(_) = tx.send(i).await {
+                println!("receiver dropped");
+                return;
+            }
+        }
+    });
+
+    loop {
+        // 当所有 sender 都被 drop 之后，从 channel 中就会收到 None
+        // 不像 go 那样需要主动关闭 channel 或者 for range
+        // Receive the next value for this receiver.
+        // `None` is returned when all `Sender` halves have dropped, indicating
+        // that no further values can be sent on the channel.
+        match rx.recv().await {
+            Some(i) => {
+                // like go func here
+                tokio::spawn(async move {
+                    println!("got = {} in spawned coroutine", i);
+                });
+            }
+            None => {
+                println!("got none");
+                break;
+            }
+        }
+    }
+}
+
+// select 在其中一个 future ready 后即返回
+// 可以用来优化长尾请求
+async fn futures_can_be_selected() {
+    let a = async { 1 };
+    let b = async { 3 };
+    let c = async { 5 };
+    let (mut x,mut y,mut z) = (Box::pin(a).fuse(), Box::pin(b).fuse(), Box::pin(c).fuse());
+    loop {
+        futures::select! {
+            xx = x => {
+                println!("a ready {}", xx);
+            },
+            yy = y => {
+                println!("b ready {}", yy);
+            },
+            zz = z => {
+                println!("c ready {}", zz);
+            },
+            complete => {
+                println!("a,b,c all complete");
+                break;
+            },
+            default => unreachable!(),
+        }
+    }
+
+    // https://rust-lang.github.io/async-book/06_multiple_futures/03_select.html
 }
 
 fn execute_future_in_non_async_functions() {
@@ -22,7 +108,6 @@ fn execute_future_in_non_async_functions() {
     // block_on 运行 future 一样可以获取到 future 的 Output
     let res = block_on(fut);
     dbg!(res);
-
 
     // 自己主动 poll 就麻烦多了，实际上还是得实现一个类似上面 block_on 功能的函数
     // https://users.rust-lang.org/t/how-to-wait-an-async-in-non-async-function/28388/21
@@ -53,9 +138,7 @@ async fn async_block_and_async_fn_are_alike() {
 
     // async closure 现在还是 unstable，需要开 feature gate
     // #![feature(async_closure)]
-    let f = async || -> String {
-        "ggg".to_string()
-    };
+    let f = async || -> String { "ggg".to_string() };
     let c = f();
 
     dbg!(futures::future::join3(a, b, c).await);
