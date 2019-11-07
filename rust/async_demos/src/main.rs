@@ -3,25 +3,60 @@ use std::pin::Pin;
 
 #[tokio::main]
 async fn main() {
-    test();
-    join_all_async_block().await;
+    // await、join 执行只能在 async 函数中
+    // 如果想在非 async 函数中执行 future，需要用特殊手段
+    execute_future_in_non_async_functions();
+    join_all_async_block_in_various_ways().await;
+    async_block_and_async_fn_are_alike().await;
 }
 
-fn test() {
+fn execute_future_in_non_async_functions() {
     let fut = hello_world();
     // 调用 async 函数有两种方法
     // 1
     // fut.await; -> await 必须在 async block、async function 或者 async closure 中使用
     // 2
     // block_on(fut); -> 如果是非 async 函数，可以直接用 block_on 等待 future 执行完毕
-    block_on(fut);
+    // block_on 运行 future 一样可以获取到 future 的 Output
+    let res = block_on(fut);
+    dbg!(res);
+
+
+    // 自己主动 poll 就麻烦多了，实际上还是得实现一个类似上面 block_on 功能的函数
+    // https://users.rust-lang.org/t/how-to-wait-an-async-in-non-async-function/28388/21
+    // 尝试让下面这段代码通过编译
+    /*
+    let poll_result = fut.poll();
+    loop {
+        match poll_result {
+            std::task::Poll::Ready(v) => {
+                println!("yes poll ready {}", v);
+                break;
+            },
+            std::task::Poll::Pending => {
+                println!("not ready yet");
+            }
+        }
+    }
+    */
 }
 
-async fn hello_world() {
+async fn return_string() -> String {
+    "def".to_string()
+}
+
+async fn async_block_and_async_fn_are_alike() {
+    let a = async { "abc".to_string() }; // this async block returns impl Future<Output=String>
+    let b = return_string(); // this async func also returns impl Future<Output=String>
+    dbg!(futures::future::join(a, b).await);
+}
+
+async fn hello_world() -> i32 {
     println!("hello world");
+    250
 }
 
-async fn join_all_async_block() {
+async fn join_all_async_block_in_various_ways() {
     let a = async { 1 };
     let b = async { 2 };
     let c = async { 3 };
