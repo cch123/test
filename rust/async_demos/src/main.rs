@@ -1,3 +1,5 @@
+#![feature(async_closure)]
+
 use futures::executor::block_on;
 use std::pin::Pin;
 
@@ -48,7 +50,15 @@ async fn return_string() -> String {
 async fn async_block_and_async_fn_are_alike() {
     let a = async { "abc".to_string() }; // this async block returns impl Future<Output=String>
     let b = return_string(); // this async func also returns impl Future<Output=String>
-    dbg!(futures::future::join(a, b).await);
+
+    // async closure 现在还是 unstable，需要开 feature gate
+    // #![feature(async_closure)]
+    let f = async || -> String {
+        "ggg".to_string()
+    };
+    let c = f();
+
+    dbg!(futures::future::join3(a, b, c).await);
 }
 
 async fn hello_world() -> i32 {
