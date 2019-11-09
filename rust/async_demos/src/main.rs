@@ -1,7 +1,7 @@
 #![feature(async_closure)]
 
 use futures::executor::block_on;
-use futures::FutureExt;
+use futures::{FutureExt, StreamExt};
 use std::pin::Pin;
 use tokio::sync::mpsc;
 use tokio::sync::oneshot;
@@ -19,6 +19,183 @@ async fn main() {
     // producer - consumer
     channel_like_go_buffered().await;
     channel_like_go_oneshot().await;
+
+    basic_synchronization().await;
+    advanced_synchronization().await;
+
+    // TODO
+    select_examples().await;
+}
+
+async fn select_examples() {
+    select_all_demo().await;
+    select_ok_demo().await;
+    select_macro().await;
+}
+
+// after either one succ, return
+// TODO
+async fn select_macro() {
+    let (mut tx, mut rx) = mpsc::channel(10);
+    let (mut tx1, mut tx2) = (tx.clone(), tx.clone());
+    let (mut tx3, mut tx4) = (tx.clone(), tx.clone());
+    let (mut producer1, mut producer2, mut producer3, mut producer4) = (
+        Box::pin(async {
+            // request baidu.com and send result to channel
+            // TODO
+            tx1.send(111).await.unwrap();
+        })
+        .fuse(),
+        Box::pin(async {
+            // request jd.com and send result to channel
+            // TODO
+            tx2.send(222).await.unwrap();
+        })
+        .fuse(),
+        Box::pin(async {
+            // request jd.com and send result to channel
+            // TODO
+            tx3.send(333).await.unwrap();
+        })
+        .fuse(),
+        Box::pin(async {
+            // 在 future 里 sleep 不应该用阻塞操作
+            // https://github.com/tokio-rs/tokio/blob/master/tokio/src/time/delay.rs
+            tokio::timer::delay_for(std::time::Duration::from_secs(10)).await;
+            tx4.send(444).await.unwrap();
+        })
+        .fuse(),
+    );
+
+    // request system 1
+    // request system 2
+    // select one producer
+    futures::select! {
+        r = producer1 => {
+            println!("producer 1 ready {:?}", r);
+        },
+        t = producer3 => {
+            println!("producer 3 ready {:?}", t);
+        },
+        s = producer2 => {
+            println!("producer 2 ready {:?}", s);
+        },
+        u = producer4 => {
+            println!("producer 4 ready {:?}", u);
+        },
+    }
+
+    match rx.recv().await {
+        Some(msg) => println!("receive {} in consumer", msg),
+        None => println!("receive chan closed"),
+    }
+}
+
+async fn select_all_demo() {
+    let a = async { 10 };
+    let b = async { 123 };
+    let fut = futures::future::select_all(vec![
+        Box::pin(a) as Pin<Box<dyn futures::Future<Output = i32>>>,
+        Box::pin(b) as Pin<Box<dyn futures::Future<Output = i32>>>,
+    ]);
+
+    match fut.await {
+        (res, siz, v) => {
+            println!("in select all, go res {}", res);
+        }
+    }
+}
+
+async fn select_ok_demo() {
+    let a = async { Ok(1) };
+    let b = async { Ok(1) };
+    let fut = futures::future::select_ok(vec![
+        Box::pin(a) as Pin<Box<dyn futures::Future<Output = Result<i32, i32>>>>,
+        Box::pin(b) as Pin<Box<dyn futures::Future<Output = Result<i32, i32>>>>,
+    ]);
+
+    match fut.await {
+        Ok((res, v)) => {
+            println!("in select ok, go res {}", res);
+        }
+        Err(e) => {
+            println!("go err in select ok, {:?}", e);
+        }
+    }
+}
+
+async fn try_join_demo() {
+    //futures::future::try_join()
+}
+
+async fn advanced_synchronization() {
+    let mut xx = std::collections::HashMap::new();
+    let (tx, mut rx) = mpsc::channel(10);
+    // way 2:
+    for i in 0..10 {
+        let mut tx = tx.clone();
+        tokio::spawn(async move {
+            // 这里如果不 move 就会告诉你外层的 tx not live long enough
+            match tx.send((i, i + 1)).await {
+                Ok(_) => {}
+                Err(e) => {
+                    println!("receiver dropped {}", e);
+                    return;
+                }
+            }
+            // Ok 返回一个 ()，一般也不关心，可以用下面这种写法
+            /*
+            if let Err(_) = tx.send((i, i+1)).await {
+            }
+            */
+        });
+    }
+
+    // 这里不 drop 的话，这个 channel 没法退出？
+    drop(tx);
+
+    // 然而用 tokio::spawn 的话，似乎就不太容易等待所有 future 都完成后再一并退出了
+    // 如果想进行同步，使用 mpsc 是可以的
+    // 不用 mpsc 的话
+    // 怎么样等待所有 spawn 的 task 结束？
+    loop {
+        match rx.recv().await {
+            Some(k) => {
+                println!("got k {:?}", k);
+                xx.insert(k.0, k.1);
+            }
+            None => {
+                println!("got none");
+                break;
+            }
+        }
+    }
+    println!("xx is {:?}", xx);
+}
+
+async fn basic_synchronization() {
+    // mutex
+    let x = std::sync::Arc::new(std::sync::RwLock::new(std::collections::HashMap::new()));
+    // spawn 和 block_on 的区别:
+    // spawn 类似于 go func
+    // 如果不显式同步，那最终不一定会得到执行
+
+    let mut futs = vec![];
+    for i in 0..20 {
+        let y = std::sync::Arc::clone(&x);
+        // 这里看起来有两种写法
+        // way 1:
+        futs.push(async move {
+            y.write().unwrap().insert(i as i32, 3);
+            println!("{:?}", y.read().unwrap());
+        });
+    }
+
+    // wg.Wait()
+    block_on(futures::future::join_all(futs));
+
+    // spawn 不一定都能得到执行，所以这里理论上应该每次结果都是一样的
+    println!("x is : {:?}", x.read().unwrap());
 }
 
 async fn channel_like_go_oneshot() {
@@ -75,7 +252,7 @@ async fn futures_can_be_selected() {
     let a = async { 1 };
     let b = async { 3 };
     let c = async { 5 };
-    let (mut x,mut y,mut z) = (Box::pin(a).fuse(), Box::pin(b).fuse(), Box::pin(c).fuse());
+    let (mut x, mut y, mut z) = (Box::pin(a).fuse(), Box::pin(b).fuse(), Box::pin(c).fuse());
     loop {
         futures::select! {
             xx = x => {
@@ -94,6 +271,29 @@ async fn futures_can_be_selected() {
             default => unreachable!(),
         }
     }
+
+    /*
+    这样是不行的，会认为在 loop 过程中，a，b、c 发生了 move
+    loop {
+        futures::select! {
+            xx = Box::pin(a).fuse() => {
+                println!("a ready {}", xx);
+            },
+            yy = Box::pin(b).fuse() => {
+                println!("b ready {}", yy);
+            },
+            zz = Box::pin(c).fuse() => {
+                println!("c ready {}", zz);
+            },
+            complete => {
+                println!("a,b,c all complete");
+                break;
+            },
+            default => unreachable!(),
+        }
+    }
+
+    */
 
     // https://rust-lang.github.io/async-book/06_multiple_futures/03_select.html
 }
