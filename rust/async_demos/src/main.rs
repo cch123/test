@@ -2,6 +2,7 @@
 //! no doc
 
 use futures::executor::block_on;
+use futures::future::select_all;
 use futures::FutureExt; //, StreamExt};
 use std::pin::Pin;
 use tokio::sync::mpsc;
@@ -95,11 +96,10 @@ async fn select_macro() {
 async fn select_all_demo() {
     let a = async { 10 };
     let b = async { 123 };
-    let fut =
-        futures::future::select_all::<Vec<Pin<Box<dyn futures::Future<Output = i32>>>>>(vec![
-            Box::pin(a),
-            Box::pin(b),
-        ]);
+    let fut = select_all::<Vec<Pin<Box<dyn futures::Future<Output = i32>>>>>(vec![
+        Box::pin(a),
+        Box::pin(b),
+    ]);
 
     match fut.await {
         (res, _siz, _v) => {
@@ -197,6 +197,7 @@ async fn basic_synchronization() {
 
     // wg.Wait()
     block_on(futures::future::join_all(futs));
+
 
     // spawn 不一定都能得到执行，所以这里理论上应该每次结果都是一样的
     println!("x is : {:?}", x.read().unwrap());
@@ -310,8 +311,34 @@ fn execute_future_in_non_async_functions() {
     // 2
     // block_on(fut); -> 如果是非 async 函数，可以直接用 block_on 等待 future 执行完毕
     // block_on 运行 future 一样可以获取到 future 的 Output
+    // 但这个 block_on 实际上是使用了 future 内置的 executor
+    // 相当于和 tokio 启动了不同的 executor
     let res = block_on(fut);
     dbg!(res);
+
+    /*
+    thread 'main' panicked at 'nested block_on: EnterError { reason: "attempted to run an executor while another executor is already running" }', src/libcore/result.rs:1165:5
+    let fut = hello_world();
+    let rt = tokio::runtime::Runtime::new().unwrap();
+    let res = rt.block_on(fut);
+    dbg!(res);
+    */
+
+    /*
+    thread 'main' panicked at 'default Tokio reactor already set for execution context', /Users/xargin/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-net-0.2.0-alpha.6/src/driver/reactor.rs:137:9
+    let fut = hello_world();
+    let mut rt = tokio::runtime::current_thread::Runtime::new().unwrap();
+    let res = rt.block_on(fut);
+    dbg!(res);
+    */
+
+    /*
+    let fut = hello_world();
+    // tokio::spawn cannot have return values
+    325 |     tokio::spawn(fut);
+    |     ^^^^^^^^^^^^ expected (), found i32
+    tokio::spawn(fut);
+    */
 
     // 自己主动 poll 就麻烦多了，实际上还是得实现一个类似上面 block_on 功能的函数
     // https://users.rust-lang.org/t/how-to-wait-an-async-in-non-async-function/28388/21
