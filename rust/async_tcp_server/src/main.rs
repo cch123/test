@@ -18,11 +18,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>>{
                 if n == 0 {
                     break;
                 }
-                println!("received packet, len {}, content : {:?}", n, buf);
+                println!("received packet, len {}, content : {:?}", n, String::from_utf8(buf[0..n].to_vec()));
 
                 conn.write_all(&buf[0..n]).await.expect("write faile");
                 // 如果收到 quit，关闭连接
-                if &buf[0..n] == b"quit\r\n" {
+                //if &buf[0..n] == b"quit\r\n" {
+                if buf[0..n].starts_with(b"quit") {
                     conn.shutdown(std::net::Shutdown::Both).expect("shutdown fuck!");
                 }
             }
