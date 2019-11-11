@@ -1,7 +1,8 @@
 #![feature(async_closure)]
+//! no doc
 
 use futures::executor::block_on;
-use futures::{FutureExt, StreamExt};
+use futures::FutureExt; //, StreamExt};
 use std::pin::Pin;
 use tokio::sync::mpsc;
 use tokio::sync::oneshot;
@@ -36,7 +37,7 @@ async fn select_examples() {
 // after either one succ, return
 // TODO
 async fn select_macro() {
-    let (mut tx, mut rx) = mpsc::channel(10);
+    let (tx, mut rx) = mpsc::channel(10);
     let (mut tx1, mut tx2) = (tx.clone(), tx.clone());
     let (mut tx3, mut tx4) = (tx.clone(), tx.clone());
     let (mut producer1, mut producer2, mut producer3, mut producer4) = (
@@ -94,13 +95,14 @@ async fn select_macro() {
 async fn select_all_demo() {
     let a = async { 10 };
     let b = async { 123 };
-    let fut = futures::future::select_all(vec![
-        Box::pin(a) as Pin<Box<dyn futures::Future<Output = i32>>>,
-        Box::pin(b) as Pin<Box<dyn futures::Future<Output = i32>>>,
-    ]);
+    let fut =
+        futures::future::select_all::<Vec<Pin<Box<dyn futures::Future<Output = i32>>>>>(vec![
+            Box::pin(a),
+            Box::pin(b),
+        ]);
 
     match fut.await {
-        (res, siz, v) => {
+        (res, _siz, _v) => {
             println!("in select all, go res {}", res);
         }
     }
@@ -109,13 +111,15 @@ async fn select_all_demo() {
 async fn select_ok_demo() {
     let a = async { Ok(1) };
     let b = async { Ok(1) };
-    let fut = futures::future::select_ok(vec![
-        Box::pin(a) as Pin<Box<dyn futures::Future<Output = Result<i32, i32>>>>,
-        Box::pin(b) as Pin<Box<dyn futures::Future<Output = Result<i32, i32>>>>,
+    let fut = futures::future::select_ok::<
+        Vec<Pin<Box<dyn futures::Future<Output = Result<i32, i32>>>>>,
+    >(vec![
+        Box::pin(a),
+        Box::pin(b), // as Pin<Box<dyn futures::Future<Output = Result<i32, i32>>>>,
     ]);
 
     match fut.await {
-        Ok((res, v)) => {
+        Ok((res, _v)) => {
             println!("in select ok, go res {}", res);
         }
         Err(e) => {
@@ -124,9 +128,9 @@ async fn select_ok_demo() {
     }
 }
 
-async fn try_join_demo() {
-    //futures::future::try_join()
-}
+//async fn try_join_demo() {
+//futures::future::try_join()
+//}
 
 async fn advanced_synchronization() {
     let mut xx = std::collections::HashMap::new();
@@ -186,7 +190,7 @@ async fn basic_synchronization() {
         // 这里看起来有两种写法
         // way 1:
         futs.push(async move {
-            y.write().unwrap().insert(i as i32, 3);
+            y.write().unwrap().insert(i, 3);
             println!("{:?}", y.read().unwrap());
         });
     }
@@ -387,11 +391,11 @@ async fn join_all_async_block_in_various_ways() {
     let b = async { 2 };
     let c = async { 3 };
     let d = async { 4 };
-    let res = futures::future::join_all(vec![
-        Box::pin(a) as Pin<Box<dyn futures::Future<Output = i32>>>,
-        Box::pin(b) as Pin<Box<dyn futures::Future<Output = i32>>>,
-        Box::pin(c) as Pin<Box<dyn futures::Future<Output = i32>>>,
-        Box::pin(d) as Pin<Box<dyn futures::Future<Output = i32>>>,
+    let res = futures::future::join_all::<Vec<Pin<Box<dyn futures::Future<Output = i32>>>>>(vec![
+        Box::pin(a), // as Pin<Box<dyn futures::Future<Output = i32>>>,
+        Box::pin(b), // as Pin<Box<dyn futures::Future<Output = i32>>>,
+        Box::pin(c), // as Pin<Box<dyn futures::Future<Output = i32>>>,
+        Box::pin(d), // as Pin<Box<dyn futures::Future<Output = i32>>>,
     ])
     .await;
     dbg!(res);
