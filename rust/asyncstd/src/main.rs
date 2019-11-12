@@ -1,6 +1,5 @@
 //!
 use async_std::{fs::File, prelude::*, task};
-use futures::executor::block_on;
 use futures::future::join_all;
 use futures::future::select_all;
 use futures::future::select_ok;
@@ -9,12 +8,12 @@ use std::pin::Pin;
 fn main() {
     read_file();
     block_wait();
-    block_on(join_mul());
-    block_on(join_mul2());
-    block_on(select_all_demo());
-    block_on(select_all_demo2());
-    block_on(select_ok_demo());
-    block_on(select_ok_demo2());
+    task::block_on(join_mul());
+    task::block_on(join_mul2());
+    task::block_on(select_all_demo());
+    task::block_on(select_all_demo2());
+    task::block_on(select_ok_demo());
+    task::block_on(select_ok_demo2());
     // TODO, try join, try join all, try select
     // TODO, join, select macro
 }
