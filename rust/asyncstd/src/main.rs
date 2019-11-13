@@ -1,5 +1,5 @@
 //!
-use async_std::{fs::File, prelude::*, task};
+use async_std::{fs::File, prelude::*, sync::channel, task};
 use futures::future::{join_all, select_all, select_ok};
 use std::pin::Pin;
 
@@ -17,26 +17,54 @@ fn main() {
 
     try_join();
     try_race();
+
+    // producer consumer
+    task::block_on(mpsc_demo());
+    // mpmc
+    // TODO
+}
+
+async fn mpsc_demo() {
+    let (sender, receiver) = channel(3);
+    for i in 0..10 {
+        let sender = sender.clone();
+        task::spawn(async move {
+            sender.send(i).await;
+        });
+    }
+    task::sleep(std::time::Duration::from_millis(100));
+    // 确保最终 receiver 会退出
+    drop(sender);
+
+    loop {
+        match receiver.recv().await {
+            Some(elem) => println!("receiver {}", elem),
+            None => {
+                println!("channel closed");
+                break;
+            },
+        }
+    }
 }
 
 // try race 的 future 必须返回 Result 类型
 // 只要其中有一个 future 能成功，就会返回成功的结果
 // 全部返回 error 的话，会返回其中的一个 error
 fn try_race() {
-    let a = async{Ok::<i32, i32>(111)};
-    let b = async{Ok::<i32, i32>(333)};
+    let a = async { Ok::<i32, i32>(111) };
+    let b = async { Ok::<i32, i32>(333) };
     let c = a.try_race(b);
     let r = task::block_on(c);
     dbg!(r.unwrap());
 
-    let a = async{Ok::<i32, i32>(111)};
-    let b = async{Err::<i32, i32>(333)};
+    let a = async { Ok::<i32, i32>(111) };
+    let b = async { Err::<i32, i32>(333) };
     let c = a.try_race(b);
     let r = task::block_on(c);
     dbg!(r);
 
-    let a = async{Err::<i32, i32>(111)};
-    let b = async{Err::<i32, i32>(333)};
+    let a = async { Err::<i32, i32>(111) };
+    let b = async { Err::<i32, i32>(333) };
     let c = a.try_race(b);
     let r = task::block_on(c);
     dbg!(r);
@@ -46,8 +74,8 @@ fn try_race() {
 // future 都成功时，会返回 tuple
 // future 全部返回 err 时，只返回第一个 err
 fn try_join() {
-    let a = async{Ok::<i32, i32>(111)};
-    let b = async{Err::<i32, i32>(333)};
+    let a = async { Ok::<i32, i32>(111) };
+    let b = async { Err::<i32, i32>(333) };
     let c = a.try_join(b);
     let r = task::block_on(c);
     match r {
@@ -55,8 +83,8 @@ fn try_join() {
         Err(e) => println!("err is {}", e),
     }
 
-    let a = async{Ok::<i32, i32>(111)};
-    let b = async{Ok::<i32, i32>(333)};
+    let a = async { Ok::<i32, i32>(111) };
+    let b = async { Ok::<i32, i32>(333) };
     let c = a.try_join(b);
     let r = task::block_on(c);
     match r {
@@ -64,8 +92,8 @@ fn try_join() {
         Err(e) => println!("err is {}", e),
     }
 
-    let a = async{Err::<i32, i32>(111)};
-    let b = async{Err::<i32, i32>(333)};
+    let a = async { Err::<i32, i32>(111) };
+    let b = async { Err::<i32, i32>(333) };
     let c = a.try_join(b);
     let r = task::block_on(c);
     match r {
@@ -73,7 +101,6 @@ fn try_join() {
         Err(e) => println!("err is {}", e),
     }
 }
-
 
 async fn async_sleep_and_delay() {
     task::sleep(std::time::Duration::from_secs(1)).await;
