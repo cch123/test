@@ -8,14 +8,58 @@ use std::pin::Pin;
 fn main() {
     read_file();
     block_wait();
+    use_async_std_join();
     task::block_on(join_mul());
     task::block_on(join_mul2());
     task::block_on(select_all_demo());
     task::block_on(select_all_demo2());
     task::block_on(select_ok_demo());
     task::block_on(select_ok_demo2());
+    task::block_on(spawn_tasks_in_vec());
     // TODO, try join, try join all, try select
     // TODO, join, select macro
+}
+
+async fn spawn_tasks_in_vec() {
+    let mut v = vec![];
+    for i in 0..10 {
+        v.push(task::spawn(async move {
+            i
+        }));
+    }
+
+    let r = futures::future::join_all(v).await;
+    dbg!(r);
+}
+
+// join in async std future
+fn use_async_std_join() {
+    let a = async { 1 };
+    let b = async { 2 };
+    let c = async { 3 };
+    let d = async { 4 };
+
+    // 这个破 join 只能 join 两个 Output 相同的 future
+    // 垃圾
+    let e = a.join(b);
+    let f = c.join(d);
+    let r = task::block_on(e.join(f));
+
+    dbg!(r);
+
+    let a = async { 1 };
+    let b = async { 2 };
+    let c = async { 3 };
+    let d = async { 4 };
+    let r = task::block_on(futures::future::join_all::<
+        Vec<Pin<Box<dyn futures::Future<Output = i32>>>>,
+    >(vec![
+        Box::pin(a),
+        Box::pin(b),
+        Box::pin(c),
+        Box::pin(d),
+    ]));
+    dbg!(r);
 }
 
 async fn select_ok_demo() {
