@@ -15,6 +15,7 @@ fn main() {
     task::block_on(select_all_demo());
     task::block_on(select_ok_demo());
     task::block_on(spawn_tasks_in_vec());
+    use_async_std_select();
     // TODO, try join, try join all, try select
     // TODO, join, select macro
 }
@@ -48,6 +49,19 @@ async fn spawn_tasks_in_vec() {
     }
 
     let r = join_all(v).await;
+    dbg!(r);
+}
+
+// async std 里的 race 和 select 意思差不多
+// https://docs.rs/async-std/1.0.1/async_std/future/trait.Future.html#method.race
+fn use_async_std_select() {
+    let a = async { 1 };
+    let b = async { 2 };
+    let c = async { 3 };
+    let d = async { 4 };
+    let e = a.race(b);
+    let f = c.race(d);
+    let r = task::block_on(e.join(f));
     dbg!(r);
 }
 
