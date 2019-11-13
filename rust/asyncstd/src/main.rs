@@ -9,6 +9,7 @@ fn main() {
     read_file();
     block_wait();
     use_async_std_join();
+    spawn_blocking();
     task::block_on(join_mul());
     task::block_on(select_all_demo());
     task::block_on(select_ok_demo());
@@ -17,13 +18,29 @@ fn main() {
     // TODO, join, select macro
 }
 
+// https://docs.rs/async-std/1.0.1/async_std/task/fn.spawn_blocking.html
+// Spawns a blocking task.
+// The task will be spawned onto a thread pool specifically dedicated to blocking tasks. This is useful to prevent long-running synchronous operations from blocking the main futures executor.
+fn spawn_blocking() {
+    let h = task::spawn_blocking(|| {
+        (0..1000000000).for_each(|_| {});
+
+        1
+    });
+
+    dbg!(h);
+
+    //let res = block_on(h);
+    //dbg!(res);
+}
+
 async fn spawn_tasks_in_vec() {
     let mut v = vec![];
     for i in 0..10 {
         v.push(task::spawn(async move { i }));
     }
 
-    let r = futures::future::join_all(v).await;
+    let r = join_all(v).await;
     dbg!(r);
 }
 
