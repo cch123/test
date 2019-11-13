@@ -32,7 +32,7 @@ async fn mpsc_demo() {
             sender.send(i).await;
         });
     }
-    task::sleep(std::time::Duration::from_millis(100));
+    task::sleep(std::time::Duration::from_millis(100)).await;
     // 确保最终 receiver 会退出
     drop(sender);
 
@@ -166,8 +166,8 @@ fn use_async_std_join() {
     let b = async { 2 };
     let c = async { 3 };
     let d = async { 4 };
-    let r = task::block_on(futures::future::join_all::<
-        Vec<Pin<Box<dyn futures::Future<Output = i32>>>>,
+    let r = task::block_on(join_all::<
+        Vec<Pin<Box<dyn Future<Output = i32>>>>,
     >(vec![
         Box::pin(a),
         Box::pin(b),
