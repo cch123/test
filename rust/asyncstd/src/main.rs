@@ -1,8 +1,6 @@
 //!
 use async_std::{fs::File, prelude::*, task};
-use futures::future::join_all;
-use futures::future::select_all;
-use futures::future::select_ok;
+use futures::future::{join_all, select_all, select_ok};
 use std::pin::Pin;
 
 fn main() {
