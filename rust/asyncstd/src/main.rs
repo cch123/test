@@ -14,9 +14,66 @@ fn main() {
     task::block_on(select_ok_demo());
     task::block_on(spawn_tasks_in_vec());
     use_async_std_select();
-    // TODO, try join, try join all, try select
-    // TODO, join, select macro
+
+    try_join();
+    try_race();
 }
+
+// try race 的 future 必须返回 Result 类型
+// 只要其中有一个 future 能成功，就会返回成功的结果
+// 全部返回 error 的话，会返回其中的一个 error
+fn try_race() {
+    let a = async{Ok::<i32, i32>(111)};
+    let b = async{Ok::<i32, i32>(333)};
+    let c = a.try_race(b);
+    let r = task::block_on(c);
+    dbg!(r.unwrap());
+
+    let a = async{Ok::<i32, i32>(111)};
+    let b = async{Err::<i32, i32>(333)};
+    let c = a.try_race(b);
+    let r = task::block_on(c);
+    dbg!(r);
+
+    let a = async{Err::<i32, i32>(111)};
+    let b = async{Err::<i32, i32>(333)};
+    let c = a.try_race(b);
+    let r = task::block_on(c);
+    dbg!(r);
+}
+
+// try join 在 future 返回 error 时，会返回一个 error
+// future 都成功时，会返回 tuple
+// future 全部返回 err 时，只返回第一个 err
+fn try_join() {
+    let a = async{Ok::<i32, i32>(111)};
+    let b = async{Err::<i32, i32>(333)};
+    let c = a.try_join(b);
+    let r = task::block_on(c);
+    match r {
+        Ok((x, y)) => println!("{}, {}", x, y),
+        Err(e) => println!("err is {}", e),
+    }
+
+    let a = async{Ok::<i32, i32>(111)};
+    let b = async{Ok::<i32, i32>(333)};
+    let c = a.try_join(b);
+    let r = task::block_on(c);
+    match r {
+        Ok((x, y)) => println!("{}, {}", x, y),
+        Err(e) => println!("err is {}", e),
+    }
+
+    let a = async{Err::<i32, i32>(111)};
+    let b = async{Err::<i32, i32>(333)};
+    let c = a.try_join(b);
+    let r = task::block_on(c);
+    match r {
+        Ok((x, y)) => println!("{}, {}", x, y),
+        Err(e) => println!("err is {}", e),
+    }
+}
+
 
 async fn async_sleep_and_delay() {
     task::sleep(std::time::Duration::from_secs(1)).await;
