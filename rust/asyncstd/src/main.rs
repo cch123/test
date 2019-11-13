@@ -10,12 +10,19 @@ fn main() {
     block_wait();
     use_async_std_join();
     spawn_blocking();
+    task::block_on(async_sleep_and_delay());
     task::block_on(join_mul());
     task::block_on(select_all_demo());
     task::block_on(select_ok_demo());
     task::block_on(spawn_tasks_in_vec());
     // TODO, try join, try join all, try select
     // TODO, join, select macro
+}
+
+async fn async_sleep_and_delay() {
+    task::sleep(std::time::Duration::from_secs(1)).await;
+    let f = async { 1 }.delay(std::time::Duration::from_secs(1));
+    f.await;
 }
 
 // https://docs.rs/async-std/1.0.1/async_std/task/fn.spawn_blocking.html
