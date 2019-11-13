@@ -10,11 +10,8 @@ fn main() {
     block_wait();
     use_async_std_join();
     task::block_on(join_mul());
-    task::block_on(join_mul2());
     task::block_on(select_all_demo());
-    task::block_on(select_all_demo2());
     task::block_on(select_ok_demo());
-    task::block_on(select_ok_demo2());
     task::block_on(spawn_tasks_in_vec());
     // TODO, try join, try join all, try select
     // TODO, join, select macro
@@ -23,9 +20,7 @@ fn main() {
 async fn spawn_tasks_in_vec() {
     let mut v = vec![];
     for i in 0..10 {
-        v.push(task::spawn(async move {
-            i
-        }));
+        v.push(task::spawn(async move { i }));
     }
 
     let r = futures::future::join_all(v).await;
@@ -78,13 +73,10 @@ async fn select_ok_demo() {
             println!("go err in select ok, {:?}", e);
         }
     }
-}
 
-async fn select_ok_demo2() {
-    let a = task::spawn(async { Ok::<i32,()>(1) });
-    let b = task::spawn(async { Ok::<i32,()>(1) });
+    let a = task::spawn(async { Ok::<i32, i32>(1) });
+    let b = task::spawn(async { Ok::<i32, i32>(1) });
     let fut = select_ok(vec![a, b]);
-
     match fut.await {
         Ok((res, _v)) => {
             println!("in select ok, go res {}", res);
@@ -105,9 +97,7 @@ async fn select_all_demo() {
             println!("in select all, go res {}", res);
         }
     }
-}
 
-async fn select_all_demo2() {
     let a = task::spawn(async { 10 });
     let b = task::spawn(async { 123 });
     let fut = select_all(vec![a, b]);
@@ -119,7 +109,7 @@ async fn select_all_demo2() {
     }
 }
 
-async fn join_mul2() {
+async fn join_mul() {
     let a = async { 1 };
     let b = async { 1 };
     let c = async { 1 };
@@ -132,16 +122,11 @@ async fn join_mul2() {
     ])
     .await;
     dbg!(res);
-}
 
-async fn join_mul() {
     let a = task::spawn(async { 1 });
     let b = task::spawn(async { 1 });
     let c = task::spawn(async { 1 });
     let d = task::spawn(async { 1 });
-    let e = task::spawn(async { 1 });
-    // async std 会直接把 join handle 给返回回来，不像 join_mul2 那样得自己做 Box::pin
-    dbg!(e);
     let res = join_all(vec![a, b, c, d]).await;
     dbg!(res);
 }
