@@ -7,6 +7,7 @@ use futures::FutureExt; //, StreamExt};
 use std::pin::Pin;
 use tokio::sync::mpsc;
 use tokio::sync::oneshot;
+//use tokio::process::Command;
 
 #[tokio::main]
 async fn main() {
@@ -427,3 +428,16 @@ async fn join_all_async_block_in_various_ways() {
     .await;
     dbg!(res);
 }
+
+/*
+https://github.com/tokio-rs/tokio/blob/8a7e57786a5dca139f5b4261685e22991ded0859/tokio/src/process/mod.rs
+*/
+/*
+async fn run_ls() -> std::process::ExitStatus {
+    Command::new("ls")
+        .spawn()
+        .expect("ls command failed to start")
+        .await
+        .expect("ls command failed to run")
+}
+*/
