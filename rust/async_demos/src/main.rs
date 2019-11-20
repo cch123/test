@@ -7,7 +7,7 @@ use futures::FutureExt; //, StreamExt};
 use std::pin::Pin;
 use tokio::sync::mpsc;
 use tokio::sync::oneshot;
-//use tokio::process::Command;
+use tokio::process::Command;
 
 #[tokio::main]
 async fn main() {
@@ -28,6 +28,9 @@ async fn main() {
 
     // TODO
     select_examples().await;
+
+    run_ls().await;
+    join_handle().await;
 }
 
 async fn select_examples() {
@@ -64,7 +67,7 @@ async fn select_macro() {
         Box::pin(async {
             // 在 future 里 sleep 不应该用阻塞操作
             // https://github.com/tokio-rs/tokio/blob/master/tokio/src/time/delay.rs
-            tokio::timer::delay_for(std::time::Duration::from_secs(10)).await;
+            tokio::time::delay_for(std::time::Duration::from_secs(10)).await;
             tx4.send(444).await.unwrap();
         })
         .fuse(),
@@ -432,7 +435,6 @@ async fn join_all_async_block_in_various_ways() {
 /*
 https://github.com/tokio-rs/tokio/blob/8a7e57786a5dca139f5b4261685e22991ded0859/tokio/src/process/mod.rs
 */
-/*
 async fn run_ls() -> std::process::ExitStatus {
     Command::new("ls")
         .spawn()
@@ -440,4 +442,14 @@ async fn run_ls() -> std::process::ExitStatus {
         .await
         .expect("ls command failed to run")
 }
-*/
+
+async fn join_handle() {
+    let a = async { 1};
+    let b = async {2};
+    let c = async {3};
+    let x = tokio::spawn(a);
+    let y = tokio::spawn(b);
+    let z = tokio::spawn(c);
+    let r= futures::future::join_all(vec![x,y,z]).await;
+    dbg!(r);
+}
