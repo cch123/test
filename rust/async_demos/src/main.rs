@@ -6,6 +6,7 @@ use futures::future::select_all;
 use futures::FutureExt; //, StreamExt};
 use std::pin::Pin;
 use tokio::sync::mpsc;
+use tokio::task;
 use tokio::sync::oneshot;
 use tokio::process::Command;
 
@@ -31,6 +32,19 @@ async fn main() {
 
     run_ls().await;
     join_handle().await;
+
+    spawn_blocking().await;
+    task_spawn().await;
+}
+
+async fn task_spawn() {
+    let r = task::spawn(async {1}).await;
+    dbg!(r);
+}
+
+async fn spawn_blocking() {
+    let r = task::spawn_blocking(move || {1}).await;
+    dbg!(r);
 }
 
 async fn select_examples() {
