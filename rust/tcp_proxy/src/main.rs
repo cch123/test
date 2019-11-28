@@ -3,7 +3,7 @@
 use futures::{future::try_join, FutureExt, StreamExt};
 use std::{env, error::Error};
 use tokio::{
-    io::AsyncReadExt,
+    io,
     net::{TcpListener, TcpStream},
 };
 
@@ -37,8 +37,8 @@ async fn transfer(mut inbound: TcpStream, proxy_addr: String) -> Result<(), Box<
     let (mut ri, mut wi) = inbound.split();
     let (mut ro, mut wo) = outbound.split();
 
-    let client_to_server = ri.copy(&mut wo);
-    let server_to_client = ro.copy(&mut wi);
+    let client_to_server = io::copy(&mut ri, &mut wo);
+    let server_to_client = io::copy(&mut ro, &mut wi);
 
     try_join(client_to_server, server_to_client).await?;
 
