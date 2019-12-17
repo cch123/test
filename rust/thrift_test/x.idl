@@ -1,0 +1,28 @@
+namespace go tthrift
+
+struct ttrace {
+    1: required string traceId;
+    2: required string caller;
+    3: required string spanId;
+    4: required string srcMethod;
+}
+
+struct fResp{
+    1: required   i32    errno   = 0;
+    2: required   string errmsg  = "success";        // 默认success
+    3: optional   string value;
+}
+
+struct resp {
+    1: required   i32                          errno   = 0;
+    2: required   string                       errmsg  = "success";
+    3: required   map<string, fResp> data;
+}
+
+service uuus {
+
+    resp mget(1:list<string> features, 2:ttrace traceInfo)
+
+    resp mset(1:map<string, string> featureValues, 2:ttrace traceInfo)
+}
+
