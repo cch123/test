@@ -1,3 +1,6 @@
+//#[macro_use] // 新版本 rust 没有 macro_use 也行
+pub mod easy;
+
 #[derive(Debug)]
 pub struct Node {
     pub val: i32,
@@ -32,4 +35,6 @@ macro_rules! linkedlist {
 fn main() {
     let x = linkedlist![1,2,3,4,5];
     dbg!(x);
+
+    println!("{}", four!())
 }
