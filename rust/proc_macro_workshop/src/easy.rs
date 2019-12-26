@@ -2,5 +2,3 @@
 macro_rules! four {
     () => { 1 + 3 };
 }
-
-pub fn ff() {}

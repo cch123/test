@@ -1,40 +1,48 @@
 //#[macro_use] // 新版本 rust 没有 macro_use 也行
 pub mod easy;
+pub mod linkedlist;
+pub use linkedlist::Node;
 
-#[derive(Debug)]
-pub struct Node {
-    pub val: i32,
-    pub next: Option<Box<Node>>,
-}
+pub mod match_rule;
 
-impl Node {
-    pub fn new(val: i32) -> Self {
-        Node {next : None, val}
-    }
-}
+pub mod bool_expr;
+pub mod count_tt;
 
-macro_rules! linkedlist {
-    () => {
-        None
-    };
-    ($ ($x:expr), *) => {
-        {
-            let mut dummy_head = Box::new(Node::new(0));
-            let mut cursor = &mut dummy_head;
-            $(
-                cursor.next = Some(Box::new($crate::Node::new($x)));
-                cursor = cursor.next.as_mut().unwrap();
-            )*
-            drop(cursor);
-
-            dummy_head.next
-        }
-    };
-}
+/*
+注意，没有 pub use 这句话，会报错
+error[E0433]: failed to resolve: maybe a missing crate `Node`?
+  --> src/linkedlist.rs:20:51
+   |
+20 |             let mut dummy_head = Box::new($crate::Node::new(0));
+   |                                                   ^^^^ maybe a missing crate `Node`?
+   |
+*/
 
 fn main() {
     let x = linkedlist![1,2,3,4,5];
     dbg!(x);
 
-    println!("{}", four!())
+    // macro in easy
+    println!("{}", four!());
+
+    // macro in match rule
+    /*
+    // 内置的 expr 规则是不支持 backtrack 的
+    // 如，调用 dead_rule 会报下列错误
+    // dead_rule!(x+);
+error: expected expression, found end of macro arguments
+  --> src/main.rs:41:18
+   |
+41 |     dead_rule!(x+);
+   |                  ^ expected expression
+
+error: aborting due to 2 previous errors
+    */
+
+    // 但是裸的 token 匹配没关系
+    aplusb!(a+);
+
+    println!("{}", count_tokens!(a , sdfsdf,d df x));
+    //count_tokens!(a , sdfsdf,d df x);
+
 }
