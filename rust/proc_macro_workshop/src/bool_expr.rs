@@ -11,16 +11,31 @@ path: , => : = > ; as
 meta: anything.
 tt: anything.
 */
-/*
-macro_rules! term {
-    () => { false };
-    ($e:expr) => {
-        println!("{} or {}", $left, $right);
-    }
+
+#[macro_export]
+macro_rules! and_expr {
+    () => {
+        false
+    };
+    ($left:expr ; and $right:expr) => {
+        if $left && $right {
+            true
+        } else {
+            false
+        }
+    };
 }
 
-macro_rules! and_expr {
-    () => { false };
-    ($left:term or $right)
+#[macro_export]
+macro_rules! or_expr {
+    () => {
+        false
+    };
+    ($left:expr ; or $right:expr) => {
+        if $left || $right {
+            true
+        } else {
+            false
+        }
+    };
 }
-*/

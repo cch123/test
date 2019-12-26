@@ -6,7 +6,7 @@ pub struct Node {
 
 impl Node {
     pub fn new(val: i32) -> Self {
-        Node {next : None, val}
+        Node { next: None, val }
     }
 }
 

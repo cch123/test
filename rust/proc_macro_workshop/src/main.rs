@@ -19,7 +19,7 @@ error[E0433]: failed to resolve: maybe a missing crate `Node`?
 */
 
 fn main() {
-    let x = linkedlist![1,2,3,4,5];
+    let x = linkedlist![1, 2, 3, 4, 5];
     dbg!(x);
 
     // macro in easy
@@ -27,22 +27,24 @@ fn main() {
 
     // macro in match rule
     /*
-    // 内置的 expr 规则是不支持 backtrack 的
-    // 如，调用 dead_rule 会报下列错误
-    // dead_rule!(x+);
-error: expected expression, found end of macro arguments
-  --> src/main.rs:41:18
-   |
-41 |     dead_rule!(x+);
-   |                  ^ expected expression
+        // 内置的 expr 规则是不支持 backtrack 的
+        // 如，调用 dead_rule 会报下列错误
+        // dead_rule!(x+);
+    error: expected expression, found end of macro arguments
+      --> src/main.rs:41:18
+       |
+    41 |     dead_rule!(x+);
+       |                  ^ expected expression
 
-error: aborting due to 2 previous errors
-    */
+    error: aborting due to 2 previous errors
+        */
 
     // 但是裸的 token 匹配没关系
     aplusb!(a+);
 
-    println!("{}", count_tokens!(a , sdfsdf,d df x));
-    //count_tokens!(a , sdfsdf,d df x);
+    println!("count tokens macro: {}", count_tokens!(a , sdfsdf,d df x));
 
+    let (a, b) = (10, -1);
+    println!("{}", and_expr!( a > 1; and b <0 ));
+    println!("{}", or_expr!( a > 1; or b <0 ));
 }
