@@ -13,6 +13,8 @@ pub mod substitution_is_not_token_based;
 
 pub mod callback;
 
+pub mod tt_muncher;
+
 /*
 注意，没有 pub use 这句话，会报错
 error[E0433]: failed to resolve: maybe a missing crate `Node`?
@@ -100,4 +102,6 @@ fn main() {
     each_tt!(trom qlip winp xod);
 
     callback::callback();
+
+    tt_muncher::tt_munchers();
 }

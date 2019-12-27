@@ -1,3 +1,4 @@
+// https://danielkeep.github.io/tlborm/book/pat-callbacks.html
 macro_rules! call_with_larch {
     ($callback:ident) => {
         $callback!(larch)
@@ -55,4 +56,3 @@ pub fn callback() {
     // 要不会报未找到，和 c 有点类似
     callback!(callback(println("Yes, this *was* unnecessary.")));
 }
-
