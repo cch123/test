@@ -7,6 +7,7 @@ pub mod match_rule;
 
 pub mod bool_expr;
 pub mod count_tt;
+pub mod substitution_is_not_token_based;
 
 /*
 注意，没有 pub use 这句话，会报错
@@ -47,4 +48,28 @@ fn main() {
     let (a, b) = (10, -1);
     println!("{}", and_expr!( a > 1; and b <0 ));
     println!("{}", or_expr!( a > 1; or b <0 ));
+
+    // stringify!(tt), stringifying a sequence of token trees
+    println!("{:?}", stringify!(dummy(2 * (1 + (3)))));
+    // stringify!(expr), stringifying an AST expression node.
+    println!("{:?}", capture_expr_then_stringify!(dummy(2 * (1 + (3)))));
+
+    // -------------------------- 对比一下这个和下面那个的输出结果
+    println!(
+        "{}\n{}\n{}\n{}",
+        what_is!(#[no_mangle]),
+        what_is!(#[inline]),
+        capture_then_what_is!(#[no_mangle]),
+        capture_then_what_is!(#[inline]),
+    );
+
+    println!(
+        "{}\n{}\n{}\n{}",
+        what_is!(#[no_mangle]),
+        what_is!(#[inline]),
+        capture_then_what_is2!(#[no_mangle]),
+        capture_then_what_is2!(#[inline]),
+    );
+    // ----------------------------------------------------------
+
 }
