@@ -31,6 +31,11 @@ macro_rules! recognise_tree {
     };
 }
 
+macro_rules! callback {
+    ($callback:ident($($args:tt)*)) => {
+        $callback!($($args)*)
+    };
+}
 /*
 Due to the order that macros are expanded in, it is (as of Rust 1.2) impossible to pass information to a macro from the expansion of another macro. This can make modularising macros very difficult.
 An alternative is to use recursion and pass a callback. Here is a trace of the above example to demonstrate how this takes place:
@@ -45,4 +50,9 @@ pub fn callback() {
 
     // 把 recognise_tree 当成一个名字传进 call_with_larch 中
     call_with_larch!(recognise_tree);
+
+    // 调用宏，需要保证宏在该函数之前定义
+    // 要不会报未找到，和 c 有点类似
+    callback!(callback(println("Yes, this *was* unnecessary.")));
 }
+
