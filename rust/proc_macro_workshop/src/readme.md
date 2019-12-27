@@ -28,3 +28,7 @@ fn main() {
     println!("{:?}", capture_expr_then_stringify!(dummy(2 * (1 + (3)))));
 }
 ```
+
+# scope
+
+https://danielkeep.github.io/tlborm/book/mbe-min-scoping.html

@@ -1,3 +1,4 @@
+#![feature(trace_macros)]
 //#[macro_use] // 新版本 rust 没有 macro_use 也行
 pub mod easy;
 pub mod linkedlist;
@@ -7,6 +8,7 @@ pub mod match_rule;
 
 pub mod bool_expr;
 pub mod count_tt;
+pub mod debug;
 pub mod substitution_is_not_token_based;
 
 /*
@@ -72,4 +74,26 @@ fn main() {
     );
     // ----------------------------------------------------------
 
+    each_tt!(foo bar baz quux);
+    trace_macros!(true);
+    /*
+      --> src/main.rs:79:5
+   |
+79 |     each_tt!(spim wak plee whum);
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: expanding `each_tt! { spim wak plee whum }`
+   = note: to `each_tt ! (wak plee whum) ;`
+   = note: expanding `each_tt! { wak plee whum }`
+   = note: to `each_tt ! (plee whum) ;`
+   = note: expanding `each_tt! { plee whum }`
+   = note: to `each_tt ! (whum) ;`
+   = note: expanding `each_tt! { whum }`
+   = note: to `each_tt ! () ;`
+   = note: expanding `each_tt! {  }`
+   = note: to ``
+    */
+    each_tt!(spim wak plee whum);
+    trace_macros!(false);
+    each_tt!(trom qlip winp xod);
 }

@@ -5,7 +5,6 @@ macro_rules! capture_expr_then_stringify {
     };
 }
 
-
 /*
 输入一旦被转成 AST 节点，那被替换的结果就没法解构了
 i.e. you cannot examine the contents or match against it ever again.
