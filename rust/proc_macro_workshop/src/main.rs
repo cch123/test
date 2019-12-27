@@ -14,6 +14,7 @@ pub mod substitution_is_not_token_based;
 pub mod callback;
 
 pub mod tt_muncher;
+pub mod internal_rule;
 
 /*
 注意，没有 pub use 这句话，会报错
@@ -104,4 +105,7 @@ fn main() {
     callback::callback();
 
     tt_muncher::tt_munchers();
+
+    internal_rule::internal_rule();
+    crate_name_util!(@count_tts);
 }
