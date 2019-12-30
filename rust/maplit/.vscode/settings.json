@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "atomic": "cpp",
+        "stdio.h": "c",
+        "stdatomic.h": "c",
+        "pthread.h": "c"
+    }
+}
