@@ -1,14 +1,13 @@
-use futures::{
-    future::{BoxFuture, FutureExt},
-    task::{waker_ref, ArcWake},
-};
-use std::future::Future;
-
-use std::sync::{Arc, Mutex};
-use std::time::Duration;
-
 pub mod executor;
 
 fn main() {
-    println!("Hello, world!");
+    let (executor, spawner) = executor::new_executor_and_spawner();
+
+    spawner.spawn(async {
+        println!("hello in async 1");
+        println!("world in async 2");
+    });
+
+    drop(spawner);
+    executor.run();
 }
