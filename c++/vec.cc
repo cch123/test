@@ -3,7 +3,7 @@
 
 using namespace std;
 
-void change_v(vector<int> v) {
+void change_v(vector<int> &v) {
     v.push_back(4);
     v.push_back(4);
     v.push_back(4);
