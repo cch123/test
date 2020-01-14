@@ -197,19 +197,20 @@ async fn advanced_synchronization() {
 
 async fn basic_synchronization() {
     // mutex
-    let x = std::sync::Arc::new(std::sync::RwLock::new(std::collections::HashMap::new()));
+    let x = std::sync::Arc::new(tokio::sync::RwLock::new(std::collections::HashMap::new()));
     // spawn 和 block_on 的区别:
     // spawn 类似于 go func
     // 如果不显式同步，那最终不一定会得到执行
 
     let mut futs = vec![];
     for i in 0..20 {
-        let y = std::sync::Arc::clone(&x);
+        //let y = std::sync::Arc::clone(&x);
         // 这里看起来有两种写法
         // way 1:
+        let x = x.clone();
         futs.push(async move {
-            y.write().unwrap().insert(i, 3);
-            println!("{:?}", y.read().unwrap());
+            x.write().await.insert(i, 3);
+            println!("{:?}", *(x.read().await));
         });
     }
 
@@ -218,7 +219,7 @@ async fn basic_synchronization() {
 
 
     // spawn 不一定都能得到执行，所以这里理论上应该每次结果都是一样的
-    println!("x is : {:?}", x.read().unwrap());
+    println!("x is : {:?}", x.read().await);
 }
 
 async fn channel_like_go_oneshot() {
