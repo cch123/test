@@ -1,0 +1,10 @@
+# github.com/cch123/elasticsql v1.0.0
+github.com/cch123/elasticsql
+# github.com/cch123/gomodexp v0.0.0-20200417090903-1acabdcf6c87
+github.com/cch123/gomodexp/esutil
+# github.com/xwb1989/sqlparser v0.0.0-20180606152119-120387863bf2
+github.com/xwb1989/sqlparser
+github.com/xwb1989/sqlparser/dependency/bytes2
+github.com/xwb1989/sqlparser/dependency/hack
+github.com/xwb1989/sqlparser/dependency/querypb
+github.com/xwb1989/sqlparser/dependency/sqltypes
