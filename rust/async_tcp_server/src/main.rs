@@ -1,5 +1,5 @@
 //! Hello world example for Rust.
-use tokio::io::{AsyncReadExt, AsyncWriteExt};
+use tokio::prelude::*;
 use tokio::net::TcpListener;
 
 #[tokio::main]

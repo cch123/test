@@ -50,17 +50,18 @@ func main() {
 }
 
 func capturePacket(deviceName string) {
-	if handle, err := pcap.OpenLive(deviceName, 1600, false, pcap.BlockForever); err != nil {
+	if handle, err := pcap.OpenLive(deviceName, 1600, true, pcap.BlockForever); err != nil {
 		fmt.Println("监听失败，请确认安装了 pacp 库。详细信息：", err)
 		os.Exit(-1)
 		// 捕获所有 源端口是 80 的 SYN、ACK 包
-	} else if err := handle.SetBPFFilter("tcp and src port 8088 and tcp[13] == 0x12"); err != nil {
+	} else if err := handle.SetBPFFilter("tcp and src port 8088"); err != nil {
 		//	} else if err := handle.SetBPFFilter("tcp and ((dst port 80 and tcp[13] == 0x02)or (src port 80 and tcp[13] == 0x12))"); err != nil {  // optional
 		panic(err)
 	} else {
 		defer handle.Close()
 		packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
 		for packet := range packetSource.Packets() {
+			fmt.Println("handle packet", deviceName, packet)
 			handlePacket(handle, packet)
 		}
 	}
@@ -69,34 +70,40 @@ func capturePacket(deviceName string) {
 func handlePacket(handle *pcap.Handle, packet gopacket.Packet) {
 	ethLayer := packet.LinkLayer()
 	if ethLayer == nil {
+		println("oh noz")
 		return
 	}
 	eth, ok := ethLayer.(*layers.Ethernet)
 	if !ok {
+		println("oh nox")
 		return
 	}
 
 	ipLayer := packet.NetworkLayer()
 	if ipLayer == nil {
+		println("oh no0")
 		return
 	}
 
 	ip, ok := ipLayer.(*layers.IPv4)
 	if !ok {
+		println("oh no1")
 		return
 	}
 
 	tcpLayer := packet.Layer(layers.LayerTypeTCP)
 	if tcpLayer == nil {
+		println("oh no2")
 		return
 	}
 	tcp, ok := tcpLayer.(*layers.TCP)
 	if !ok {
+		println("oh no3")
 		return
 	}
 
 	// 服务器回应 SYN 请求
-	if tcp.SYN == true && tcp.ACK == true {
+	if 1 == 1 { //tcp.SYN == true && tcp.ACK == true {
 		ttl := uint8(0)
 
 		switch {
