@@ -9,7 +9,7 @@ import (
 )
 
 var (
-    device       string = "eth0"
+    device       string = "lo0"
     snapshot_len int32  = 1024
     promiscuous  bool   = false
     err          error
@@ -26,7 +26,7 @@ func main() {
     defer handle.Close()
 
     // Set filter
-    var filter string = "tcp and port 80"
+    var filter string = "tcp and port 6379 and tcp[tcpflags] & (tcp-syn) != 0 and tcp[tcpflags] & (tcp-ack) != 0"
     err = handle.SetBPFFilter(filter)
     if err != nil {
         log.Fatal(err)
