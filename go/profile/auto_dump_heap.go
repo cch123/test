@@ -4,11 +4,18 @@ import (
 	"fmt"
 	"os"
 	"runtime"
-	"runtime/pprof"
+	ppp "runtime/pprof"
 	"time"
+
+	"net/http"
+	_ "net/http/pprof"
 
 	"github.com/cch123/elasticsql"
 )
+
+func init() {
+	go http.ListenAndServe(":8888", nil)
+}
 
 var (
 	tickInterval = time.Second * 2
@@ -56,7 +63,7 @@ func writeHeapToFile() {
 		return
 	}
 
-	err = pprof.Lookup("heap").WriteTo(f, 1)
+	err = ppp.Lookup("heap").WriteTo(f, 0)
 	if err != nil {
 		fmt.Println("[autodump] write profile to file failed", err)
 	}
