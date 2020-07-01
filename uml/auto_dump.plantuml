@@ -1,0 +1,16 @@
+@startuml auto dump
+participant watchdog
+participant mosn
+
+loop every 5 seconds
+watchdog -> mosn: send http request get g num
+watchdog -> ps: get mosn process cpu/mem usage
+watchdog -> watchdog:
+    alt cpu/mem/g exceed threshold
+        watchdog -> mosn: request mosn HTTP API, get heap/g/cpu profile
+        watchdog -> watchdog: save profile
+    else threshold is not meet
+        watchdog -> watchdog: do nothing
+end
+
+@enduml
