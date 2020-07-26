@@ -1,0 +1,15 @@
+@startuml auto dump
+participant mosn
+
+loop every 5 seconds
+mosn -> mosn: runtime.NumGoroutine
+mosn -> ps: get mosn process cpu/mem usage
+mosn -> mosn:
+    alt cpu/mem/g exceed threshold
+        mosn -> mosn : start profile CPU/mem/g
+        mosn -> mosn : save g/mem/CPU profile
+    else threshold is not meet
+        mosn -> mosn : do nothing
+end
+
+@enduml
