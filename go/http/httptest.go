@@ -24,7 +24,7 @@ func sayhello(wr http.ResponseWriter, r *http.Request) {
 
 func main() {
 	http.HandleFunc("/", sayhello)
-	err := http.ListenAndServe(":10002", nil)
+	err := http.ListenAndServe(":10003", nil)
 	if err != nil {
 		log.Fatal("ListenAndServe:", err)
 	}
