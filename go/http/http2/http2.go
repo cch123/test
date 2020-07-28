@@ -24,7 +24,7 @@ func sayhello(wr http.ResponseWriter, r *http.Request) {
 
 func main() {
 	http.HandleFunc("/", sayhello)
-	err := http.ListenAndServeTLS(":9090", "./server.crt", "./server.key", nil)
+	err := http.ListenAndServeTLS(":10002", "./example.crt", "./example.key", nil)
 	if err != nil {
 		log.Fatal("ListenAndServe:", err)
 	}
