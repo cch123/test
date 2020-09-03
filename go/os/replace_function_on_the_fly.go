@@ -5,6 +5,8 @@ import (
 	"os"
 	"os/exec"
 	"reflect"
+	"strconv"
+	"strings"
 	"syscall"
 	"unsafe"
 )
@@ -14,19 +16,53 @@ func HeiHeiHei() {
 	println("hei")
 }
 
+//go:noinline
+func heiheiPrivate() {
+	println("oh no")
+}
+
 func Replace() {
 	println("fuck")
 }
 
-func main() {
+func generateFuncName2PtrDict() map[string]uintptr {
 	fileFullPath := os.Args[0]
-	fmt.Println(fileFullPath)
+
 	cmd := exec.Command("nm", fileFullPath)
 	contentBytes, err := cmd.Output()
-	fmt.Println(string(contentBytes), err)
+	if err != nil {
+		println(err)
+		return nil
+	}
+
+	var result = map[string]uintptr{}
+	content := string(contentBytes)
+	fmt.Println(content)
+	lines := strings.Split(content, "\n")
+	for _, line := range lines {
+		arr := strings.Split(line, " ")
+		if len(arr) < 3 {
+			continue
+		}
+		funcSymbol, addr := arr[2], arr[0]
+		fmt.Println(funcSymbol, addr)
+		addrUint, _ := strconv.ParseUint(addr, 16, 64)
+		result[funcSymbol] = uintptr(addrUint)
+		fmt.Println(funcSymbol, addrUint)
+	}
+	return result
+}
+
+func main() {
+	m := generateFuncName2PtrDict()
+
 	HeiHeiHei()
 	replaceFunction(reflect.ValueOf(HeiHeiHei).Pointer(), (uintptr)(getPtr(reflect.ValueOf(Replace))))
 	HeiHeiHei()
+
+	heiheiPrivate()
+	replaceFunction(m["_main.heiheiPrivate"], (uintptr)(getPtr(reflect.ValueOf(Replace))))
+	heiheiPrivate()
 }
 
 type value struct {
@@ -98,4 +134,9 @@ func copyToLocation(location uintptr, data []byte) {
 
 func pageStart(ptr uintptr) uintptr {
 	return ptr & ^(uintptr(syscall.Getpagesize() - 1))
+}
+
+// TODO，用 nm 读出来的 sym table 是有 symbol size 的
+func unpatch(target uintptr, originalBytes []byte) {
+	copyToLocation(target, originalBytes)
 }
