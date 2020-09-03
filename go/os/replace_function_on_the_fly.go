@@ -61,7 +61,12 @@ func main() {
 	HeiHeiHei()
 
 	heiheiPrivate()
-	replaceFunction(m["_main.heiheiPrivate"], (uintptr)(getPtr(reflect.ValueOf(Replace))))
+	originalBytes := replaceFunction(m["_main.heiheiPrivate"], (uintptr)(getPtr(reflect.ValueOf(Replace))))
+	fmt.Println(originalBytes)
+	heiheiPrivate()
+
+	// recover function
+	copyToLocation(m["_main.heiheiPrivate"], originalBytes)
 	heiheiPrivate()
 }
 
