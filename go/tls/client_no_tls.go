@@ -1,7 +1,6 @@
 package main
 
 import (
-	"crypto/tls"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -13,7 +12,6 @@ import (
 )
 
 func main() {
-	url := os.Args[3]
 	connNum, err := strconv.ParseInt(os.Args[1], 10, 64)
 	if err != nil {
 		fmt.Println(err)
@@ -26,10 +24,25 @@ func main() {
 		return
 	}
 
+	url := //os.Args[3]
+		"http://100.88.107.242:8080"
+
 	bucket := ratelimit.New(int(qps))
 
 	var l sync.Mutex
 	connList := make([]*http.Client, connNum)
+	/*
+		for i := 0; i < int(connNum); i++ {
+			connList = append(connList, &http.Client{
+				Transport: &http.Transport{
+					TLSClientConfig:     &tls.Config{InsecureSkipVerify: true},
+					IdleConnTimeout:     0,
+					MaxIdleConns:        1,
+					MaxIdleConnsPerHost: 1,
+				},
+			})
+		}
+	*/
 
 	for i := 0; ; i++ {
 		bucket.Take()
@@ -39,7 +52,6 @@ func main() {
 			if connList[i%len(connList)] == nil {
 				connList[i%len(connList)] = &http.Client{
 					Transport: &http.Transport{
-						TLSClientConfig:     &tls.Config{InsecureSkipVerify: true},
 						IdleConnTimeout:     0,
 						MaxIdleConns:        1,
 						MaxIdleConnsPerHost: 1,
