@@ -27,11 +27,12 @@ func TestBalanced(t *testing.T) {
 	count := map[string]int{}
 	// 随机生成 1000 个 host
 	rand.Seed(time.Now().Unix())
-	for i := 0; i < 50000; i++ {
-		ip := fmt.Sprintf("%v.%v.%v.%v", rand.Intn(256), rand.Intn(256), rand.Intn(256), rand.Intn(256))
+	for i := 0; i < 10000; i++ {
+		//ip := fmt.Sprintf("%v.%v.%v.%v", rand.Intn(256), rand.Intn(256), rand.Intn(256), rand.Intn(256))
+		hostName := fmt.Sprintf("%v%v", "consumer", i)
 		// TODO farmhash
 		// 这里 client id 用 hash 类的值是比较难保证均匀的
-		clientID := murmur3.Sum32([]byte(ip))
+		clientID := murmur3.Sum32([]byte(hostName))
 		//clientID = uint32(i)
 		subset := Subset(getOriginalBackends(), int(clientID), subsetSize)
 		for _, server := range subset {
