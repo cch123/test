@@ -16,6 +16,12 @@ func main() {
 		return
 	}
 
+	cert, err := tls.LoadX509KeyPair("server.crt", "server.key")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
 	for {
 		c, err := l.Accept()
 		if err != nil {
@@ -25,7 +31,7 @@ func main() {
 
 		go func() {
 			c = tls.Server(c, &tls.Config{
-				// TODO, cert and key
+				Certificates: []tls.Certificate{cert}, InsecureSkipVerify: true,
 			})
 
 			if err != nil {
@@ -49,7 +55,7 @@ func main() {
 				}
 
 				// write respose
-				resp := &http.Response{Header: http.Header{}, Body: http.NoBody}
+				resp := &http.Response{ProtoMajor: 1, ProtoMinor: 1,StatusCode : http.StatusOK, Header: http.Header{}, Body: http.NoBody}
 				err = resp.Write(c)
 				if err != nil {
 					fmt.Println(err)
