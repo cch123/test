@@ -7,7 +7,13 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
+
+	_ "net/http/pprof"
 )
+
+func init() {
+	go http.ListenAndServe(":9999", nil)
+}
 
 func main() {
 	l, err := net.Listen("tcp4", ":1234")
