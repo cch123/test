@@ -4,22 +4,19 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strings"
 )
 
-func main() {
-
-	url := "https://www2.deepl.com/jsonrpc"
-	method := "POST"
-
-	payload := strings.NewReader(`{
+var tpl = `
+{
     "jsonrpc": "2.0",
     "method": "LMT_handle_jobs",
     "params": {
         "jobs": [
             {
                 "kind": "default",
-                "raw_en_sentence": "把这段话翻译成英文吧",
+                "raw_en_sentence": "%v",
                 "raw_en_context_before": [],
                 "raw_en_context_after": [],
                 "preferred_num_beams": 4
@@ -41,7 +38,17 @@ func main() {
         "timestamp": 1613714284739
     },
     "id": 84460005
-}`)
+}
+`
+
+func main() {
+
+	content := os.Args[1]
+
+	url := "https://www2.deepl.com/jsonrpc"
+	method := "POST"
+
+	payload := strings.NewReader(fmt.Sprintf(tpl, content))
 
 	client := &http.Client{}
 	req, err := http.NewRequest(method, url, payload)
