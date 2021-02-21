@@ -40,7 +40,7 @@ var tpl = `
 }
 `
 
-var content = `为了区分是平均的慢还是长尾的慢，最简单的方式就是按照请求延迟的范围进行分组。例如，统计延迟在0~10ms之间的请求数有多少而10~20ms之间的请求数又有多少。通过这种方式可以快速分析系统慢的原因。Histogram和Summary都是为了能够解决这样问题的存在，通过Histogram和Summary类型的监控指标，我们可以快速了解监控样本的分布情况。`
+var content = ``
 
 func main() {
 	urll := "https://www2.deepl.com/jsonrpc"
