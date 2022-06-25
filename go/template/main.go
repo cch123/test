@@ -7,7 +7,7 @@ import (
 )
 
 type QueryValue struct {
-	Emit        bool
+	EmitStruct  bool
 	EmitPointer bool
 	Name        string
 	Struct      *Struct
