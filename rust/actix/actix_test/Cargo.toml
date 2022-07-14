@@ -7,7 +7,7 @@ edition = "2018"
 [dependencies]
 actix-web = "1.0"
 futures = "0.1.25"
-http = "0.1.0"
+http = "0.1.20"
 actix-http = "0.2.3"
 
 [dev-dependencies]
